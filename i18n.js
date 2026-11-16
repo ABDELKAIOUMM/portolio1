@@ -298,6 +298,16 @@
         // The page remains usable when storage is unavailable.
     }
 
+    // Dynamic copy from the admin panel is merged in at runtime so any key set
+    // in content/site.json wins over the static defaults above.
+    function mergeMessages(extra) {
+        if (!extra || typeof extra !== "object") return;
+        ["en", "ar"].forEach(function (lang) {
+            if (!extra[lang] || typeof extra[lang] !== "object") return;
+            messages[lang] = Object.assign({}, messages[lang], extra[lang]);
+        });
+    }
+
     function t(key, values) {
         let message = (messages[language] && messages[language][key]) || messages.en[key] || key;
         if (values) {
@@ -358,11 +368,23 @@
         t: t,
         getLanguage: function () { return language; },
         setLanguage: setLanguage,
+        merge: function (extra) {
+            mergeMessages(extra);
+            localize();
+        },
+        localize: localize,
         localizeDigits: function (value) {
             const text = String(value);
             return language === "ar" ? text.replace(/[0-9]/g, function (digit) { return "٠١٢٣٤٥٦٧٨٩"[Number(digit)]; }) : text;
         }
     };
+
+    // Content edited from the dashboard is applied before first paint, then the
+    // page copy is localized a single time with the merged strings.
+    try {
+        const pending = window.__SITE_CONTENT__;
+        if (pending && pending._i18n) mergeMessages(pending._i18n);
+    } catch (error) { /* keep default copy */ }
 
     localize();
 })();

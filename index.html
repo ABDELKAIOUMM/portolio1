@@ -722,8 +722,13 @@
     </div>
   </footer>
 
+  <!-- Editable content: bundled snapshot, then the live JSON refresh. -->
+  <script src="content/site-data.js"></script>
+  <script src="content-loader.js"></script>
   <!-- Localization must initialize before UI scripts read page copy. -->
   <script src="i18n.js"></script>
+  <!-- Paints every editable section from content/site.json -->
+  <script src="site-content.js"></script>
   <!-- Main Script -->
   <script src="script.js"></script>
 </body>
