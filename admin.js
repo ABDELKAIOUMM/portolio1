@@ -170,11 +170,42 @@
 
   async function loadContent() {
     let remote = null;
+    const github = window.GitHubPublish;
+    if (github) github.load();
+
+    // 1) Local server API (node server.js)
     try {
       remote = await fetchJSON(API.content);
       state.online = true;
+      state.mode = "local";
     } catch (error) {
       state.online = false;
+      state.mode = "offline";
+    }
+
+    // 2) GitHub API (works on static hosting, needs a token)
+    if (!remote && github && github.configured()) {
+      try {
+        const file = await github.readFile("content/site.json");
+        if (file) {
+          remote = JSON.parse(file.text);
+          state.mode = "github";
+        }
+      } catch (gitError) {
+        toast("تعذّر قراءة المحتوى من GitHub: " + gitError.message, "error");
+      }
+    }
+
+    // 3) Plain static hosting: published content file, then bundled snapshot
+    if (!remote) {
+      try {
+        remote = await fetchJSON("content/site.json");
+      } catch (error) {
+        remote = null;
+      }
+    }
+    if (!remote && window.__SITE_CONTENT__) {
+      remote = clone(window.__SITE_CONTENT__);
     }
 
     let draft = null;
@@ -192,8 +223,8 @@
     state.content = normalize(draft || remote);
     state.original = clone(state.content);
     state.dirty = Boolean(draft && remote && draft.updatedAt !== remote.updatedAt);
-    if (!remote && draft) {
-      toast("اللوحة مفتوحة بدون السيرفر — التعديلات بتُحفظ في المتصفح فقط.", "warn");
+    if (!draft && !remote) {
+      toast("مفيش محتوى محفوظ — ابدأ من الصفر أو استورد site.json.", "warn");
     }
     renderAll();
   }
@@ -252,10 +283,26 @@
         markClean(state.content.updatedAt);
         toast("تم حفظ التعديلات على الموقع ✓");
         loadBackups();
+      } else if (state.mode === "github" && window.GitHubPublish && window.GitHubPublish.configured()) {
+        q(".btn__label", button).textContent = "جارٍ النشر على GitHub…";
+        const result = await window.GitHubPublish.publish(payload, (step) => {
+          q(".btn__label", button).textContent = step;
+        });
+        state.content.updatedAt = result.updatedAt;
+        state.original = clone(state.content);
+        markClean(state.content.updatedAt);
+        localStorage.removeItem(LS_KEY);
+        toast("تم النشر على GitHub ✓ — GitHub Pages هيتحدّث في خلال دقيقة.", "ok");
+        renderGhStatus();
       } else {
         state.original = clone(state.content);
         markClean(state.content.updatedAt);
-        toast("اتحفظت في المتصفح. شغّل node server.js للحفظ على الملفات.", "warn");
+        toast(
+          state.mode === "offline" && !(window.GitHubPublish && window.GitHubPublish.configured())
+            ? "تم الحفظ في المتصفح فقط. فعّل GitHub من تبويب «الإعدادات» عشان تنشر."
+            : "تم الحفظ في المتصفح.",
+          "warn"
+        );
       }
       renderStats();
     } catch (error) {
@@ -278,6 +325,17 @@
 
   async function uploadImage(file) {
     const dataUrl = await readFileAsDataURL(file);
+
+    // GitHub mode: commit the image into the repo so it survives reloads
+    // and is served by GitHub Pages.
+    if (!state.online && state.mode === "github" && window.GitHubPublish && window.GitHubPublish.configured()) {
+      try {
+        return await window.GitHubPublish.uploadImage(file, dataUrl);
+      } catch (error) {
+        toast("فشل رفع الصورة على GitHub: " + error.message, "error");
+      }
+    }
+
     if (state.online) {
       try {
         const response = await fetch(API.upload, {
@@ -927,7 +985,18 @@
     list.innerHTML = '<p class="muted">جارٍ التحميل…</p>';
 
     if (!state.online) {
-      list.innerHTML = '<p class="muted">النسخ الاحتياطية بتظهر لما تشغّل السيرفر: <code>node server.js</code></p>';
+      if (state.mode === "github" && window.GitHubPublish && window.GitHubPublish.configured()) {
+        list.innerHTML =
+          '<p class="muted">في وضع GitHub كل حفظ بيعمل commit. تقدر ترجع لأي نسخة من ' +
+          'تاريخ الريبو على GitHub مباشرة.</p>' +
+          '<p class="muted"><a class="gh-history-link" target="_blank" rel="noopener" href="' +
+          'https://github.com/' + window.GitHubPublish.state.owner + "/" + window.GitHubPublish.state.repo +
+          '/commits/' + window.GitHubPublish.state.branch + '/content/site.json">' +
+          'افتح تاريخ المحتوى على GitHub ↗</a></p>';
+        return;
+      }
+      list.innerHTML = '<p class="muted">النسخ الاحتياطية بتظهر لما تشغّل السيرفر: <code>node server.js</code> ' +
+        'أو تفعّل وضع GitHub من فوق.</p>';
       return;
     }
 
@@ -1193,18 +1262,97 @@
   function setConnectionBadge() {
     const badge = el("connBadge");
     if (!badge) return;
+    badge.classList.remove("is-online", "is-offline", "is-github");
     if (state.online) {
       badge.textContent = "متصل — الحفظ على الملفات ✓";
       badge.classList.add("is-online");
+    } else if (state.mode === "github" && window.GitHubPublish && window.GitHubPublish.configured()) {
+      badge.textContent = "GitHub — النشر مباشرة ✓";
+      badge.classList.add("is-github");
     } else {
-      badge.textContent = "بدون سيرفر — حفظ في المتصفح";
+      badge.textContent = "حفظ في المتصفح — فعّل GitHub";
       badge.classList.add("is-offline");
     }
+  }
+
+  function renderGhStatus() {
+    const badge = el("ghBadge");
+    const status = el("ghStatus");
+    const github = window.GitHubPublish;
+    if (!github) return;
+    github.load();
+    const ready = github.configured();
+    if (badge) {
+      badge.textContent = ready ? "مُفعّل ✓" : "غير مُفعّل";
+      badge.classList.toggle("is-on", ready);
+    }
+    if (status) {
+      status.textContent = ready
+        ? "النشر على " + github.state.owner + "/" + github.state.repo + " (" + github.state.branch + ")"
+        : "لسه ما اتوصلناش. أضف التوكن من الفورم فوق.";
+      status.classList.toggle("is-on", ready);
+    }
+  }
+
+  function wireGithub() {
+    const github = window.GitHubPublish;
+    const form = el("ghForm");
+    if (!github || !form) return;
+
+    github.load();
+    form.elements.token.value = github.state.token || "";
+    form.elements.owner.value = github.state.owner || "";
+    form.elements.repo.value = github.state.repo || "";
+    form.elements.branch.value = github.state.branch || "main";
+    renderGhStatus();
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      github.persist({
+        token: form.elements.token.value,
+        owner: form.elements.owner.value,
+        repo: form.elements.repo.value,
+        branch: form.elements.branch.value
+      });
+      const status = el("ghStatus");
+      if (status) status.textContent = "جارٍ اختبار الاتصال…";
+      try {
+        const info = await github.verify();
+        if (status) {
+          status.textContent = "متصل بـ " + info.owner + "/" + info.repo + " ✓ — تقدر تنشر دلوقتي.";
+          status.classList.add("is-on");
+        }
+        state.mode = "github";
+        renderGhStatus();
+        setConnectionBadge();
+        toast("تم تفعيل النشر على GitHub ✓", "ok");
+      } catch (error) {
+        if (status) {
+          status.textContent = "فشل الاتصال: " + error.message;
+          status.classList.remove("is-on");
+        }
+        toast("فشل الاتصال بـ GitHub: " + error.message, "error");
+      }
+    });
+
+    el("ghDisconnect").addEventListener("click", () => {
+      if (!window.confirm("قطع الاتصال بGitHub ومسح التوكن من المتصفح؟")) return;
+      github.persist({ token: "", owner: github.state.defaultOwner || "", repo: github.state.defaultRepo || "", branch: "main" });
+      form.elements.token.value = "";
+      state.mode = state.online ? "local" : "offline";
+      renderGhStatus();
+      setConnectionBadge();
+      toast("تم قطع الاتصال.");
+    });
+
+    // A token already stored in this browser means GitHub mode is live on load.
+    if (github.configured() && !state.online) state.mode = "github";
   }
 
   async function boot() {
     await loadContent();
     wireEvents();
+    wireGithub();
     setConnectionBadge();
     markClean(state.content.updatedAt);
     if (state.dirty) {

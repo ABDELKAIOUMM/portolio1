@@ -345,6 +345,52 @@
 
         <!-- ============ SETTINGS ============ -->
         <section class="panel" data-panel="settings">
+          <div class="card card--github">
+            <div class="card__head">
+              <h2>النشر على GitHub</h2>
+              <span class="gh-badge" id="ghBadge">غير مُفعّل</span>
+            </div>
+            <p class="muted">
+              فعّل الوضع ده عشان تحفظ مباشرة في ريبو GitHub — مفيد لما تفتح اللوحة من
+              <code>abdelkaioumm.github.io/portolio1/admin.html</code> من أي جهاز.
+            </p>
+            <details class="gh-help">
+              <summary>إزاي أطلع التوكن؟ (خطوات)</summary>
+              <ol>
+                <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank"
+                    rel="noopener">Fine-grained token</a> جديد.</li>
+                <li><strong>Repository access</strong> → اختر <strong>Only select repositories</strong> → الريبو بتاعك.</li>
+                <li><strong>Permissions</strong> → <strong>Contents</strong> → <strong>Read and write</strong>.</li>
+                <li>اضغط Generate، وانسخ التوكن (بيظهر مرة واحدة بس).</li>
+                <li>الصقه هنا واضغط «اختبار الاتصال».</li>
+              </ol>
+              <p class="note">التوكن بيتخزن في المتصفح ده بس (localStorage) وما بيتبعتش لأي مكان غير api.github.com.</p>
+            </details>
+            <form class="form-grid" id="ghForm">
+              <label class="field">
+                <span>GitHub Token</span>
+                <input type="password" name="token" dir="ltr" placeholder="github_pat_…" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>اسم المستخدم / المنظمة</span>
+                <input type="text" name="owner" dir="ltr" placeholder="ABDELKAIOUMM" />
+              </label>
+              <label class="field">
+                <span>اسم الريبو</span>
+                <input type="text" name="repo" dir="ltr" placeholder="portolio1" />
+              </label>
+              <label class="field">
+                <span>الفرع</span>
+                <input type="text" name="branch" dir="ltr" placeholder="main" />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary">اختبار الاتصال</button>
+                <button type="button" class="btn btn--ghost" id="ghDisconnect">قطع الاتصال</button>
+              </div>
+            </form>
+            <p class="gh-status" id="ghStatus" role="status" aria-live="polite"></p>
+          </div>
+
           <div class="card">
             <h2>الإعدادات العامة</h2>
             <form class="form-grid" data-form="meta">
@@ -379,6 +425,7 @@
 
   <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
 
+  <script src="admin-github.js"></script>
   <script src="admin.js"></script>
 </body>
 

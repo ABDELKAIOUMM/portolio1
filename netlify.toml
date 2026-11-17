@@ -1,22 +1,18 @@
 # Static hosting config for the portfolio.
-# The site itself needs no build step; the dashboard API only runs locally
-# with `node server.js`, so the admin route is hidden on public deploys.
+# The site needs no build step. The dashboard also works on static hosting:
+# enable "GitHub publishing" inside /admin.html to save straight into the repo.
 [build]
   publish = "."
   command = "echo 'Static site - no build required'"
 
-[[redirects]]
-  from = "/admin.html"
-  to = "/"
-  status = 302
-
-[[redirects]]
-  from = "/admin"
-  to = "/"
-  status = 302
-
+# Backup files and the local server are never part of the public site.
 [[redirects]]
   from = "/content/backups/*"
+  to = "/"
+  status = 302
+
+[[redirects]]
+  from = "/server.js"
   to = "/"
   status = 302
 
@@ -29,3 +25,8 @@
   for = "/assets/uploads/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
