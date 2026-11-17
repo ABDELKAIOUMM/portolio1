@@ -309,6 +309,7 @@
     persist: persist,
     configured: configured,
     verify: verify,
+    readFile: readFile,
     publish: publish,
     uploadImage: uploadImage,
     state: state,
