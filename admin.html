@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>لوحة التحكم | ABDELKAIOUM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="admin-brand">
+        <span class="admin-brand__mark" aria-hidden="true">ع</span>
+        <div>
+          <strong>لوحة التحكم</strong>
+          <small>إدارة محتوى الموقع</small>
+        </div>
+      </div>
+
+      <nav class="admin-nav" id="adminNav" aria-label="أقسام لوحة التحكم">
+        <button type="button" class="admin-nav__item is-active" data-panel="home">
+          <span class="admin-nav__icon" aria-hidden="true">⌂</span> نظرة عامة
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="projects">
+          <span class="admin-nav__icon" aria-hidden="true">▦</span> الأعمال السابقة
+          <span class="admin-nav__count" id="projectsCount">0</span>
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="hero">
+          <span class="admin-nav__icon" aria-hidden="true">★</span> الواجهة الرئيسية
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="services">
+          <span class="admin-nav__icon" aria-hidden="true">◈</span> الخدمات
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="story">
+          <span class="admin-nav__icon" aria-hidden="true">⇢</span> طريقة العمل
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="skills">
+          <span class="admin-nav__icon" aria-hidden="true">◇</span> المهارات
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="contact">
+          <span class="admin-nav__icon" aria-hidden="true">✉</span> التواصل والفوتر
+        </button>
+        <button type="button" class="admin-nav__item" data-panel="settings">
+          <span class="admin-nav__icon" aria-hidden="true">⚙</span> الإعدادات والنسخ
+        </button>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a class="admin-linkbtn" href="/" target="_blank" rel="noopener">معاينة الموقع ↗</a>
+        <p class="admin-save-state" id="saveState" role="status" aria-live="polite">كل التعديلات محفوظة</p>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <button type="button" class="admin-burger" id="sidebarToggle" aria-label="إظهار القائمة">☰</button>
+        <div>
+          <h1 id="panelTitle">نظرة عامة</h1>
+          <p id="panelSubtitle">عدّل محتوى الموقع وأضف أعمالك السابقة من مكان واحد.</p>
+        </div>
+        <div class="admin-topbar__actions">
+          <span class="admin-pill" id="connBadge" title="حالة الاتصال بمحرر الملفات">جارٍ الفحص…</span>
+          <button type="button" class="btn btn--ghost" id="undoBtn" title="رجوع لآخر نسخة محفوظة">↺ تراجع</button>
+          <button type="button" class="btn btn--primary" id="saveBtn">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__label">حفظ التعديلات</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="admin-body">
+
+        <!-- ============ OVERVIEW ============ -->
+        <section class="panel is-active" data-panel="home">
+          <div class="stat-grid">
+            <article class="stat-card">
+              <span class="stat-card__label">أعمال منشورة</span>
+              <strong class="stat-card__value" id="statProjects">0</strong>
+              <span class="stat-card__hint">تظهر في قسم «الأعمال»</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">الخدمات</span>
+              <strong class="stat-card__value" id="statServices">0</strong>
+              <span class="stat-card__hint">بطاقات قسم الخدمات</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">المهارات</span>
+              <strong class="stat-card__value" id="statSkills">0</strong>
+              <span class="stat-card__hint">شارات الشريط المتحرك</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">آخر حفظ</span>
+              <strong class="stat-card__value stat-card__value--sm" id="statUpdated">—</strong>
+              <span class="stat-card__hint">وقت آخر تعديل محفوظ</span>
+            </article>
+          </div>
+
+          <div class="split-grid">
+            <article class="card">
+              <h2>أضف عملًا سابقًا بسرعة</h2>
+              <p class="muted">أدخل الاسم والرابط، وأضف صورة معاينة — وسيظهر مباشرة في قسم الأعمال.</p>
+              <form id="quickProjectForm" class="form-grid">
+                <label class="field">
+                  <span>اسم المشروع</span>
+                  <input type="text" name="title" placeholder="مثال: Fashion Store" required />
+                </label>
+                <label class="field">
+                  <span>رابط الموقع</span>
+                  <input type="url" name="url" placeholder="https://example.com" />
+                </label>
+                <label class="field field--full">
+                  <span>صورة معاينة (اختياري)</span>
+                  <input type="file" accept="image/*" data-image-picker />
+                </label>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn--primary">إضافة العمل</button>
+                  <button type="button" class="btn btn--ghost" data-goto-projects>إدارة كل الأعمال ←</button>
+                </div>
+              </form>
+            </article>
+
+            <article class="card card--tips">
+              <h2>كيف تشتغل اللوحة؟</h2>
+              <ol class="tips-list">
+                <li>عدّل أي نص بالعربية أو الإنجليزية من التبويب المناسب.</li>
+                <li>اضغط <strong>حفظ التعديلات</strong> — بيتم تحديث <code>content/site.json</code> مع نسخة احتياطية تلقائية.</li>
+                <li>لإضافة صورة، ارفعها من نفس الحقل؛ بتنحفظ في <code>assets/uploads/</code>.</li>
+                <li>للتراجع عن أي تعديل، استخدم زر <strong>تراجع</strong> أو تبويب النسخ الاحتياطية.</li>
+              </ol>
+              <p class="note">لو اللوحة مفتوحة بدون السيرفر (<code>node server.js</code>)، الحفظ بيتم في المتصفح فقط. شغّل
+                السيرفر للتعديل المباشر على الملفات.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ============ PROJECTS ============ -->
+        <section class="panel" data-panel="projects">
+          <div class="panel-toolbar">
+            <div class="search-field">
+              <span aria-hidden="true">⌕</span>
+              <input type="search" id="projectSearch" placeholder="ابحث في الأعمال…" />
+            </div>
+            <button type="button" class="btn btn--primary" id="newProjectBtn">+ عمل جديد</button>
+          </div>
+          <div class="projects-list" id="projectsList"></div>
+          <p class="empty-state" id="projectsEmpty" hidden>لا توجد أعمال بعد. اضغط «عمل جديد» لإضافة أول عمل.</p>
+
+          <div class="editor-drawer" id="projectEditor" hidden>
+            <div class="editor-drawer__head">
+              <h2 id="projectEditorTitle">تعديل العمل</h2>
+              <button type="button" class="btn btn--icon" data-close-editor aria-label="إغلاق">✕</button>
+            </div>
+            <form id="projectForm" class="form-grid" autocomplete="off">
+              <input type="hidden" name="id" />
+              <label class="field">
+                <span>اسم المشروع (عربي)</span>
+                <input type="text" name="title_ar" dir="rtl" placeholder="اسم المشروع بالعربي" />
+              </label>
+              <label class="field">
+                <span>اسم المشروع (إنجليزي)</span>
+                <input type="text" name="title_en" dir="ltr" placeholder="Project name" />
+              </label>
+              <label class="field field--full">
+                <span>وصف المشروع (عربي)</span>
+                <textarea name="copy_ar" rows="3" dir="rtl" placeholder="إيه اللي عملته في المشروع…"></textarea>
+              </label>
+              <label class="field field--full">
+                <span>وصف المشروع (إنجليزي)</span>
+                <textarea name="copy_en" rows="3" dir="ltr" placeholder="What you built…"></textarea>
+              </label>
+              <label class="field">
+                <span>رابط الموقع</span>
+                <input type="url" name="url" dir="ltr" placeholder="https://example.com" />
+              </label>
+              <label class="field">
+                <span>شارات/تقنيات (افصل بفاصلة)</span>
+                <input type="text" name="tags" placeholder="WordPress, WooCommerce, SEO" />
+              </label>
+              <div class="field field--full">
+                <span>صورة المعاينة</span>
+                <div class="image-field">
+                  <div class="image-field__preview" data-project-preview>
+                    <span>لا توجد صورة</span>
+                  </div>
+                  <div class="image-field__controls">
+                    <label class="btn btn--ghost btn--upload">
+                      رفع صورة
+                      <input type="file" accept="image/*" data-image-picker hidden />
+                    </label>
+                    <label class="field field--inline">
+                      <span>أو رابط صورة</span>
+                      <input type="url" name="image" dir="ltr" placeholder="https://… أو assets/uploads/…" />
+                    </label>
+                    <button type="button" class="btn btn--ghost btn--danger" data-clear-image>إزالة الصورة</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions form-actions--split">
+                <label class="switch">
+                  <input type="checkbox" name="visible" checked />
+                  <span class="switch__track" aria-hidden="true"></span>
+                  <span>ظاهر على الموقع</span>
+                </label>
+                <div class="form-actions__buttons">
+                  <button type="button" class="btn btn--ghost btn--danger" data-delete-project>حذف</button>
+                  <button type="submit" class="btn btn--primary">حفظ العمل</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ============ HERO ============ -->
+        <section class="panel" data-panel="hero">
+          <form class="card form-card" data-form="hero">
+            <h2>الواجهة الرئيسية</h2>
+            <div class="form-grid">
+              <label class="field"><span>السطر التمهيدي (ع)</span><input name="eyebrow_ar" dir="rtl" /></label>
+              <label class="field"><span>Eyebrow (EN)</span><input name="eyebrow_en" dir="ltr" /></label>
+              <label class="field"><span>العنوان الرئيسي (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Main title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field"><span>المسمى الوظيفي (ع)</span><input name="role_ar" dir="rtl" /></label>
+              <label class="field"><span>Role (EN)</span><input name="role_en" dir="ltr" /></label>
+              <label class="field field--full"><span>سطر الوصف (ع) — كل سطر لوحده</span>
+                <textarea name="lines_ar" rows="3" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Description lines (EN) — one per line</span>
+                <textarea name="lines_en" rows="3" dir="ltr"></textarea></label>
+              <label class="field"><span>نص زر الدعوة (ع)</span><input name="cta_ar" dir="rtl" /></label>
+              <label class="field"><span>CTA button (EN)</span><input name="cta_en" dir="ltr" /></label>
+              <label class="field"><span>رابط الزر</span><input name="ctaHref" dir="ltr" /></label>
+              <label class="field"><span>وصف صورة البروفايل (ع)</span><input name="portraitAlt_ar" dir="rtl" /></label>
+              <div class="field field--full">
+                <span>صورة البروفايل</span>
+                <div class="image-field">
+                  <div class="image-field__preview image-field__preview--portrait" data-portrait-preview></div>
+                  <div class="image-field__controls">
+                    <label class="btn btn--ghost btn--upload">رفع صورة جديدة
+                      <input type="file" accept="image/*" data-portrait-picker hidden />
+                    </label>
+                    <label class="field field--inline"><span>أو مسار الصورة</span>
+                      <input name="portrait" dir="ltr" /></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- ============ SERVICES ============ -->
+        <section class="panel" data-panel="services">
+          <form class="card form-card" data-form="services">
+            <h2>عناوين قسم الخدمات</h2>
+            <div class="form-grid">
+              <label class="field"><span>تمهيد (ع)</span><input name="eyebrow_ar" dir="rtl" /></label>
+              <label class="field"><span>Eyebrow (EN)</span><input name="eyebrow_en" dir="ltr" /></label>
+              <label class="field"><span>العنوان (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field field--full"><span>المقدمة (ع)</span><textarea name="intro_ar" rows="2" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Intro (EN)</span><textarea name="intro_en" rows="2" dir="ltr"></textarea></label>
+            </div>
+          </form>
+          <div class="card">
+            <div class="card__head">
+              <h2>بطاقات الخدمات</h2>
+              <button type="button" class="btn btn--ghost" id="newServiceBtn">+ خدمة</button>
+            </div>
+            <div class="repeat-list" id="servicesList"></div>
+          </div>
+        </section>
+
+        <!-- ============ STORY ============ -->
+        <section class="panel" data-panel="story">
+          <form class="card form-card" data-form="story">
+            <h2>قسم طريقة العمل</h2>
+            <div class="form-grid">
+              <label class="field"><span>تمهيد (ع)</span><input name="eyebrow_ar" dir="rtl" /></label>
+              <label class="field"><span>Eyebrow (EN)</span><input name="eyebrow_en" dir="ltr" /></label>
+              <label class="field"><span>العنوان (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field field--full"><span>المقدمة (ع)</span><textarea name="intro_ar" rows="2" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Intro (EN)</span><textarea name="intro_en" rows="2" dir="ltr"></textarea></label>
+              <label class="field"><span>وسم المراحل (ع)</span><input name="stagesLabel_ar" dir="rtl" /></label>
+              <label class="field"><span>Stages label (EN)</span><input name="stagesLabel_en" dir="ltr" /></label>
+            </div>
+          </form>
+          <div class="card">
+            <div class="card__head">
+              <h2>مراحل العمل</h2>
+              <button type="button" class="btn btn--ghost" id="newStepBtn">+ مرحلة</button>
+            </div>
+            <div class="repeat-list" id="storyList"></div>
+          </div>
+        </section>
+
+        <!-- ============ SKILLS ============ -->
+        <section class="panel" data-panel="skills">
+          <form class="card form-card" data-form="skills">
+            <h2>عناوين قسم المهارات</h2>
+            <div class="form-grid">
+              <label class="field"><span>العنوان (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field field--full"><span>المقدمة (ع)</span><textarea name="intro_ar" rows="2" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Intro (EN)</span><textarea name="intro_en" rows="2" dir="ltr"></textarea></label>
+            </div>
+          </form>
+          <div class="card">
+            <div class="card__head">
+              <h2>المهارات والتقنيات</h2>
+              <button type="button" class="btn btn--ghost" id="newSkillBtn">+ مهارة</button>
+            </div>
+            <div class="repeat-list repeat-list--compact" id="skillsList"></div>
+          </div>
+        </section>
+
+        <!-- ============ CONTACT ============ -->
+        <section class="panel" data-panel="contact">
+          <form class="card form-card" data-form="contact">
+            <h2>قسم التواصل</h2>
+            <div class="form-grid">
+              <label class="field"><span>تمهيد (ع)</span><input name="eyebrow_ar" dir="rtl" /></label>
+              <label class="field"><span>Eyebrow (EN)</span><input name="eyebrow_en" dir="ltr" /></label>
+              <label class="field"><span>العنوان (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field field--full"><span>النص (ع)</span><textarea name="copy_ar" rows="2" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Copy (EN)</span><textarea name="copy_en" rows="2" dir="ltr"></textarea></label>
+              <label class="field"><span>رقم واتساب (أرقام فقط مع كود الدولة)</span><input name="whatsapp" dir="ltr" placeholder="201129114212" /></label>
+              <label class="field"><span>البريد الإلكتروني</span><input name="email" dir="ltr" placeholder="you@example.com" /></label>
+              <label class="field"><span>نص زر واتساب (ع)</span><input name="whatsappLabel_ar" dir="rtl" /></label>
+              <label class="field"><span>WhatsApp label (EN)</span><input name="whatsappLabel_en" dir="ltr" /></label>
+              <label class="field"><span>نص زر البريد (ع)</span><input name="emailLabel_ar" dir="rtl" /></label>
+              <label class="field"><span>Email label (EN)</span><input name="emailLabel_en" dir="ltr" /></label>
+              <label class="field field--full"><span>حقوق الفوتر (ع)</span><input name="footerRights_ar" dir="rtl" /></label>
+              <label class="field field--full"><span>Footer rights (EN)</span><input name="footerRights_en" dir="ltr" /></label>
+            </div>
+          </form>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section class="panel" data-panel="settings">
+          <div class="card card--github">
+            <div class="card__head">
+              <h2>النشر على GitHub</h2>
+              <span class="gh-badge" id="ghBadge">غير مُفعّل</span>
+            </div>
+            <p class="muted">
+              فعّل الوضع ده عشان تحفظ مباشرة في ريبو GitHub — مفيد لما تفتح اللوحة من
+              <code>abdelkaioumm.github.io/portolio1/admin.html</code> من أي جهاز.
+            </p>
+            <details class="gh-help">
+              <summary>إزاي أطلع التوكن؟ (خطوات)</summary>
+              <ol>
+                <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank"
+                    rel="noopener">Fine-grained token</a> جديد.</li>
+                <li><strong>Repository access</strong> → اختر <strong>Only select repositories</strong> → الريبو بتاعك.</li>
+                <li><strong>Permissions</strong> → <strong>Contents</strong> → <strong>Read and write</strong>.</li>
+                <li>اضغط Generate، وانسخ التوكن (بيظهر مرة واحدة بس).</li>
+                <li>الصقه هنا واضغط «اختبار الاتصال».</li>
+              </ol>
+              <p class="note">التوكن بيتخزن في المتصفح ده بس (localStorage) وما بيتبعتش لأي مكان غير api.github.com.</p>
+            </details>
+            <form class="form-grid" id="ghForm">
+              <label class="field">
+                <span>GitHub Token</span>
+                <input type="password" name="token" dir="ltr" placeholder="github_pat_…" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>اسم المستخدم / المنظمة</span>
+                <input type="text" name="owner" dir="ltr" placeholder="ABDELKAIOUMM" />
+              </label>
+              <label class="field">
+                <span>اسم الريبو</span>
+                <input type="text" name="repo" dir="ltr" placeholder="portolio1" />
+              </label>
+              <label class="field">
+                <span>الفرع</span>
+                <input type="text" name="branch" dir="ltr" placeholder="main" />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary">اختبار الاتصال</button>
+                <button type="button" class="btn btn--ghost" id="ghDisconnect">قطع الاتصال</button>
+              </div>
+            </form>
+            <p class="gh-status" id="ghStatus" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="card">
+            <h2>الإعدادات العامة</h2>
+            <form class="form-grid" data-form="meta">
+              <label class="field"><span>عنوان الصفحة (ع)</span><input name="title_ar" dir="rtl" /></label>
+              <label class="field"><span>Page title (EN)</span><input name="title_en" dir="ltr" /></label>
+              <label class="field field--full"><span>وصف الصفحة (ع)</span><textarea name="description_ar" rows="2" dir="rtl"></textarea></label>
+              <label class="field field--full"><span>Meta description (EN)</span><textarea name="description_en" rows="2" dir="ltr"></textarea></label>
+            </form>
+          </div>
+
+          <div class="card">
+            <h2>النسخ الاحتياطية</h2>
+            <p class="muted">كل عملية حفظ تعمل نسخة قبل التعديل. تقدر ترجع لأي نسخة بضغطة.</p>
+            <div class="backup-list" id="backupList"></div>
+          </div>
+
+          <div class="card">
+            <h2>نقل المحتوى</h2>
+            <div class="transfer-actions">
+              <button type="button" class="btn btn--ghost" id="exportBtn">⬇ تصدير site.json</button>
+              <label class="btn btn--ghost btn--upload">⬆ استيراد ملف JSON
+                <input type="file" accept="application/json,.json" id="importInput" hidden />
+              </label>
+              <button type="button" class="btn btn--ghost btn--danger" id="resetBtn">استعادة المحتوى الأصلي</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+
+  <script src="admin-github.js"></script>
+  <script src="admin.js"></script>
+</body>
+
+</html>

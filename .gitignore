@@ -32,3 +32,10 @@ index.backup*.html
 Attached Element Context from Integrated.txt
 .ticker_transform.py
 {'
+
+# Dashboard backups are local history, not published content
+content/backups/*
+!content/backups/.gitkeep
+
+# Next.js scratch app (not part of the static site build)
+next-app/
