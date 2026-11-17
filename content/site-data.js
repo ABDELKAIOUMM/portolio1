@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-17T18:43:43.421Z",
+  "updatedAt": "2026-11-17T18:48:27.493Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -185,17 +185,23 @@ window.__SITE_CONTENT__ = {
       {
         "id": "project-mwl1jdpi-hgbf",
         "title": {
-          "en": "red-sweetie",
-          "ar": "red-sweetie"
+          "en": "Red Sweetie — Arabic E-Commerce Store with CMS Admin Panel",
+          "ar": "Red Sweetie — متجر حلويات إلكتروني عربي مع لوحة تحكم"
         },
         "copy": {
-          "en": "",
-          "ar": ""
+          "en": "An Arabic (RTL) e-commerce store for sweets delivery in Zagazig & Abu Hamad, Egypt — built on Cloudflare Workers with a full CMS admin panel for products, pricing and delivery, and WhatsApp ordering with automatic per-city delivery fees.",
+          "ar": "متجر عربي (RTL) لبيع الحلويات والتوصيل في الزقازيق وأبو حماد، مبني على Cloudflare Workers مع لوحة تحكم CMS كاملة لإدارة المنتجات والأسعار والتوصيل، وطلب عبر واتساب بحساب تلقائي لرسوم التوصيل."
         },
         "url": "https://red-sweetie.abdlkayomd.workers.dev/",
         "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
-        "tags": [],
-        "visible": true
+        "tags": [
+          {
+            "en": "D1 · JavaScript · HTML/CSS",
+            "ar": "D1 · JavaScript · HTML/CSS"
+          }
+        ],
+        "visible": true,
+        "updatedAt": "2026-11-17T18:48:24.093Z"
       },
       {
         "id": "vercel",
