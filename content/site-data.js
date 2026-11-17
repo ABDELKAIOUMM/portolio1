@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-17T16:33:15.140Z",
+  "updatedAt": "2026-11-17T18:43:43.421Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -183,6 +183,21 @@ window.__SITE_CONTENT__ = {
     },
     "items": [
       {
+        "id": "project-mwl1jdpi-hgbf",
+        "title": {
+          "en": "red-sweetie",
+          "ar": "red-sweetie"
+        },
+        "copy": {
+          "en": "",
+          "ar": ""
+        },
+        "url": "https://red-sweetie.abdlkayomd.workers.dev/",
+        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
+        "tags": [],
+        "visible": true
+      },
+      {
         "id": "vercel",
         "title": {
           "en": "Vercel",
@@ -193,7 +208,7 @@ window.__SITE_CONTENT__ = {
           "ar": "موقع تسويقي ولوحة تحكم بواجهة داكنة وحركة مدروسة ومكتبة مكونات مصممة للسرعة."
         },
         "url": "https://vercel.com",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://vercel.com",
+        "image": "assets/uploads/WhatsApp-Image-2026-11-17-at-8.43.24-PM-mwl1jbhz.jpg",
         "tags": [
           {
             "en": "Next.js",
