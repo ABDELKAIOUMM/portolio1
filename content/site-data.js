@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-17T18:48:27.493Z",
+  "updatedAt": "2026-11-17T18:53:04.132Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -229,7 +229,8 @@ window.__SITE_CONTENT__ = {
             "ar": "الأداء"
           }
         ],
-        "visible": true
+        "visible": false,
+        "updatedAt": "2026-11-17T18:48:37.244Z"
       },
       {
         "id": "stripe",
