@@ -1,0 +1,17 @@
+{
+  "name": "abdelkaioum-portfolio",
+  "private": true,
+  "description": "Static portfolio and dashboard. Node is only needed for local editing and tests.",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@fontsource/noto-sans-arabic": "^5.3.0",
+    "@fontsource/orbitron": "^5.3.0",
+    "@playwright/test": "^1.65.1",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.14"
+  }
+}

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 
 <head>
@@ -18,7 +18,8 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=work-viewport-4" />
+  <link rel="stylesheet" href="work.css?v=work-viewport-4" />
 </head>
 
 <body>
@@ -195,7 +196,7 @@
       </div>
 
       <!-- Previous Work -->
-      <div class="work-stage" id="workStage">
+      <div class="work-stage" id="workStage" role="region" aria-labelledby="work-title">
         <div id="work" class="section-head work-heading">
           <div>
             <p class="eyebrow" data-i18n="work.eyebrow">Portfolio</p>
@@ -205,9 +206,9 @@
           </p>
         </div>
 
-        <div class="work-grid" id="workGrid" data-reveal-group>
+        <div class="work-grid" id="workGrid" data-lenis-prevent>
 
-          <article class="project" data-reveal data-url="https://vercel.com" data-shot="">
+          <article class="project" data-url="https://vercel.com" data-shot="">
             <a class="project-media" href="https://vercel.com" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://vercel.com"
@@ -230,7 +231,7 @@
             </div>
           </article>
 
-          <article class="project" data-reveal data-url="https://stripe.com" data-shot="">
+          <article class="project" data-url="https://stripe.com" data-shot="">
             <a class="project-media" href="https://stripe.com" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://stripe.com"
@@ -252,7 +253,7 @@
             </div>
           </article>
 
-          <article class="project" data-reveal data-url="https://linear.app" data-shot="">
+          <article class="project" data-url="https://linear.app" data-shot="">
             <a class="project-media" href="https://linear.app" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://linear.app"
@@ -275,7 +276,7 @@
             </div>
           </article>
 
-          <article class="project" data-reveal data-url="https://www.figma.com" data-shot="">
+          <article class="project" data-url="https://www.figma.com" data-shot="">
             <a class="project-media" href="https://www.figma.com" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.figma.com"
@@ -297,7 +298,7 @@
             </div>
           </article>
 
-          <article class="project" data-reveal data-url="https://tailwindcss.com" data-shot="">
+          <article class="project" data-url="https://tailwindcss.com" data-shot="">
             <a class="project-media" href="https://tailwindcss.com" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://tailwindcss.com"
@@ -320,7 +321,7 @@
             </div>
           </article>
 
-          <article class="project" data-reveal data-url="https://www.raycast.com" data-shot="">
+          <article class="project" data-url="https://www.raycast.com" data-shot="">
             <a class="project-media" href="https://www.raycast.com" target="_blank" rel="noopener" tabindex="-1"
               aria-hidden="true">
               <img src="https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.raycast.com"
@@ -343,8 +344,14 @@
           </article>
         </div>
 
-        <div class="work-pagination" id="workPagination" role="tablist" aria-label="Project navigation"
-          data-i18n-aria="work.pagination"></div>
+        <div class="work-controls" id="workControls">
+          <button class="work-arrow" id="workPrevious" type="button" aria-label="Previous project"
+            data-i18n-aria="project.previousProject"><span aria-hidden="true">←</span></button>
+          <div class="work-pagination" id="workPagination" aria-label="Project navigation"
+            data-i18n-aria="work.pagination"></div>
+          <button class="work-arrow" id="workNext" type="button" aria-label="Next project"
+            data-i18n-aria="project.nextProject"><span aria-hidden="true">→</span></button>
+        </div>
       </div>
 
       <!-- Product storyline -->
@@ -710,6 +717,62 @@
     </section>
   </main>
 
+
+  <!-- Native modal keeps focus inside the gallery and supports Escape. Images
+       are assigned only when a visitor opens a project. -->
+  <dialog class="project-gallery" id="projectGallery" aria-labelledby="galleryTitle" data-lenis-prevent>
+    <div class="gallery-shell">
+      <header class="gallery-topbar">
+        <p class="gallery-eyebrow" data-i18n="project.gallery">Project gallery</p>
+        <button class="gallery-icon-button gallery-close" type="button" data-gallery-close
+          aria-label="Close gallery" data-i18n-aria="project.closeGallery" autofocus>✕</button>
+      </header>
+      <div class="gallery-layout">
+        <section class="gallery-visuals" aria-label="Project screenshots" data-i18n-aria="project.screenshots">
+          <div class="gallery-tabs" role="tablist" aria-label="Screenshot category" data-i18n-aria="project.category">
+            <button type="button" role="tab" id="gallerySiteTab" aria-controls="galleryPanel" data-gallery-tab="site">
+              <span data-i18n="project.siteShots">Website</span><span data-gallery-tab-count="site">0</span>
+            </button>
+            <button type="button" role="tab" id="galleryDashboardTab" aria-controls="galleryPanel" data-gallery-tab="dashboard">
+              <span data-i18n="project.dashboardShots">Dashboard</span><span data-gallery-tab-count="dashboard">0</span>
+            </button>
+          </div>
+          <div class="gallery-panel" id="galleryPanel" role="tabpanel" aria-labelledby="gallerySiteTab" tabindex="0">
+            <div class="gallery-canvas">
+              <div class="gallery-image-scroll" id="galleryImageScroll" tabindex="0"
+                aria-label="Screenshot preview" data-i18n-aria="project.imagePreview">
+                <img id="galleryImage" alt="" decoding="async" />
+                <p class="gallery-empty" id="galleryEmpty" hidden></p>
+              </div>
+              <button class="gallery-icon-button gallery-image-arrow gallery-image-arrow--previous" type="button"
+                data-gallery-previous aria-label="Previous image" data-i18n-aria="project.previousImage">←</button>
+              <button class="gallery-icon-button gallery-image-arrow gallery-image-arrow--next" type="button"
+                data-gallery-next aria-label="Next image" data-i18n-aria="project.nextImage">→</button>
+            </div>
+            <div class="gallery-image-tools">
+              <span class="gallery-counter" id="galleryCounter" role="status" aria-live="polite" aria-atomic="true"></span>
+              <button class="gallery-zoom" type="button" id="galleryZoom" aria-pressed="false">
+                <span aria-hidden="true">⤢</span> <span data-gallery-zoom-label>Inspect image</span>
+              </button>
+            </div>
+            <div class="gallery-thumbnails" id="galleryThumbnails" role="group" aria-label="Choose an image"
+              data-i18n-aria="project.chooseImage"></div>
+          </div>
+        </section>
+        <aside class="gallery-details">
+          <span class="gallery-project-number" id="galleryProjectNumber"></span>
+          <h2 id="galleryTitle"></h2>
+          <p id="galleryDescription"></p>
+          <ul class="project-tags gallery-tags" id="galleryTags"></ul>
+          <a class="gallery-visit" id="galleryVisit" target="_blank" rel="noopener noreferrer">
+            <span data-gallery-visit-label>Visit site</span><span aria-hidden="true">↗</span>
+          </a>
+          <p class="gallery-tip" data-i18n="project.galleryTip">The details, from storefront to dashboard.</p>
+        </aside>
+      </div>
+    </div>
+  </dialog>
+
   <footer class="site-footer">
     <div class="footer-inner wrap">
 
@@ -728,9 +791,12 @@
   <!-- Localization must initialize before UI scripts read page copy. -->
   <script src="i18n.js"></script>
   <!-- Paints every editable section from content/site.json -->
+  <script src="project-media.js"></script>
   <script src="site-content.js"></script>
   <!-- Main Script -->
-  <script src="script.js"></script>
+  <script src="script.js?v=work-viewport-4"></script>
+  <script src="work-carousel.js?v=work-viewport-4"></script>
+  <script src="project-gallery.js"></script>
 </body>
 
 </html>

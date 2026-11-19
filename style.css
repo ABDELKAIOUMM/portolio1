@@ -643,6 +643,11 @@ button:focus-visible {
   }
 }
 
+/* A wrapped/zoomed navbar must not cover most of a short phone window. */
+@media (max-width: 700px) and (max-height: 420px) {
+  .site-header { position: relative; top: auto; }
+}
+
 /* Ã˜Â¹Ã™â€žÃ™â€° Ã˜Â§Ã™â€žÃ˜Â´Ã˜Â§Ã˜Â´Ã˜Â§Ã˜Âª Ã˜Â§Ã™â€žÃ˜Â¶Ã™Å Ã™â€šÃ˜Â© Ã˜Â¬Ã˜Â¯Ã™â€¹Ã˜Â§: Ã™â€¦Ã™â€ Ã˜Â¹ Ã˜Â£Ã™Å  Ã˜ÂªÃ™â€¦Ã˜Â±Ã™Å Ã˜Â± Ã˜Â£Ã™ÂÃ™â€šÃ™Å  Ã™â€¦Ã™â€  Ã˜Â®Ã˜Â· Ã˜Â§Ã™â€žÃ™â€ Ã˜Â§Ã™ÂÃ˜Â¨Ã˜Â§Ã˜Â± */
 @media (max-width: 420px) {
   .nav-links::after {
@@ -1317,386 +1322,7 @@ button:focus-visible {
 /* ============================================================
      WORK / PREVIOUS PROJECTS
      ============================================================ */
-.work-stage {
-  position: relative;
-  isolation: isolate;
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: 0;
-  height: 100vh;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  perspective: 1400px;
-  perspective-origin: 50% 50%;
-  contain: layout paint;
-}
-
-.work-grid {
-  position: relative;
-  top: clamp(1.5rem, 5vh, 3rem);
-  display: block;
-  width: min(100%, 420px);
-  height: min(72vh, 620px);
-  margin: 0 auto;
-  transform-style: preserve-3d;
-  perspective: 1400px;
-}
-
-.project {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg);
-  overflow: hidden;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  transform-origin: center center;
-  will-change: transform, opacity;
-  transition:
-    border-color 0.4s var(--ease-soft),
-    background 0.4s var(--ease-soft),
-    box-shadow 0.4s var(--ease-out);
-}
-
-.project:hover {
-  border-color: var(--line-strong);
-  background: var(--bg);
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.95);
-}
-
-/* ---------- Ã˜ÂµÃ™Ë†Ã˜Â±Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹ ---------- */
-.project-media {
-  position: relative;
-  display: block;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
-    #0a0a0c;
-  border-bottom: 1px solid var(--line);
-}
-
-.project-media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  filter: grayscale(0) contrast(1.05);
-  opacity: 1;
-  transform: scale(1.01);
-  transition:
-    transform 0.7s var(--ease-out),
-    filter 0.5s var(--ease-soft),
-    opacity 0.5s var(--ease-soft);
-}
-
-.project:hover .project-media img {
-  transform: scale(1.03);
-  filter: grayscale(0);
-  opacity: 1;
-}
-
-/* Ã˜ÂªÃ˜Â¯Ã˜Â±Ã™â€˜Ã˜Â¬ Ã˜Â³Ã™ÂÃ™â€žÃ™Å  Ã™Å Ã˜Â¯Ã™â€¦Ã˜Â¬ Ã˜Â§Ã™â€žÃ˜ÂµÃ™Ë†Ã˜Â±Ã˜Â© Ã™â€¦Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â¨Ã˜Â·Ã˜Â§Ã™â€šÃ˜Â© */
-.project-media::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg,
-      rgba(0, 0, 0, 0) 45%,
-      rgba(0, 0, 0, 0.55) 100%);
-}
-
-/* ---------- Ã˜ÂªÃ™ÂÃ˜Â§Ã˜ÂµÃ™Å Ã™â€ž Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â´Ã˜Â±Ã™Ë†Ã˜Â¹ ---------- */
-.project-body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 0.6rem;
-  padding: clamp(1.1rem, 2.6vw, 1.5rem);
-  position: relative;
-  z-index: 2;
-  transform: translateZ(28px);
-  transform-origin: center center;
-}
-
-.project-body h3 {
-  margin: 0;
-  font-family: var(--font-headline);
-  font-size: clamp(0.95rem, 1.7vw, 1.1rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.project-body p {
-  margin: 0;
-  color: var(--muted);
-  font-size: clamp(0.86rem, 1.25vw, 0.93rem);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.project-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0.15rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.project-tags li {
-  padding: 0.22rem 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: #b6b6bf;
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-}
-
-.project-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: auto;
-  padding-top: 0.9rem;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.project-link span {
-  display: inline-block;
-  transition: transform 0.35s var(--ease-out);
-}
-
-.project-link:hover span,
-.project-link:focus-visible span {
-  transform: translateX(4px);
-}
-
-.project-link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-.project-link:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 4px;
-  border-radius: 4px;
-}
-
-/* ============================================================
-     WORK Ã¢â‚¬— Scroll-Driven 3D Coverflow Slider
-     (layout transform + pinning only; card visuals untouched)
-     ============================================================ */
-
-/* Pinned viewport for the slider */
-.work-stage {
-  position: relative;
-  /* Break out of the padded .wrap column and center on the real viewport.
-       --sbw (scrollbar width) is set from JS so 100vw doesn't overshoot. */
-  width: calc(100vw - var(--sbw, 0px));
-  max-width: calc(100vw - var(--sbw, 0px));
-  margin-left: calc(50% - (100vw - var(--sbw, 0px)) / 2);
-  margin-right: 0;
-  height: 100vh;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  perspective: 1400px;
-  perspective-origin: 50% 50%;
-}
-
-.work-heading {
-  position: absolute;
-  inset: calc(var(--nav-h) + clamp(0.75rem, 2.5vh, 1.5rem)) 0 auto;
-  z-index: 20;
-  width: min(calc(100% - 3rem), 1040px);
-  margin: 0 auto;
-  padding: 0.75rem 0 1rem;
-  background: #050607;
-  box-shadow: 0 12px 16px #050607;
-}
-
-.section-head.work-heading {
-  flex-direction: row;
-  align-items: flex-end;
-}
-
-/* Track: cards are stacked in the same spot, then spread by GSAP */
-.work-grid {
-  position: relative;
-  display: block;
-  width: min(100%, 450px);
-  height: min(54svh, 460px);
-  margin: 0 auto;
-  transform-style: preserve-3d;
-  perspective: 1400px;
-}
-
-.work-grid>.project {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
-}
-
-@media (max-width: 899px) {
-  .work-heading {
-    inset: calc(var(--nav-h) + clamp(0.75rem, 2.5svh, 1.5rem)) 0 auto;
-    width: min(calc(100% - 2rem), 560px);
-  }
-
-  .section-head.work-heading {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .work-grid {
-    width: min(calc(100% - 2rem), 450px);
-    top: clamp(4rem, 14svh, 5rem);
-    height: min(34svh, 300px);
-  }
-}
-
-@media (min-width: 481px) and (max-width: 899px) {
-  .work-heading {
-    inset: calc(var(--nav-h) + clamp(0.75rem, 2.5svh, 1.5rem)) 0 auto;
-    width: min(calc(100% - 3rem), 560px);
-  }
-
-  .work-grid {
-    width: min(calc(100% - 3rem), 420px);
-    top: clamp(1.5rem, 5svh, 2.5rem);
-    height: min(42svh, 360px);
-  }
-}
-
-@media (max-width: 480px) {
-  .work-heading {
-    inset: clamp(0.75rem, 2.5svh, 1.25rem) 0 auto;
-    padding-block: 0.5rem 0.75rem;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 899px) and (max-height: 600px) {
-  .work-heading {
-    inset: calc(var(--nav-h) + 0.5rem) 0 auto;
-  }
-
-  .work-grid {
-    width: min(calc(100% - 3rem), 380px);
-    top: clamp(5rem, 22svh, 7rem);
-    height: min(30svh, 220px);
-  }
-}
-
-@media (min-width: 900px) and (max-width: 1199px) {
-  .work-grid {
-    width: min(100%, 420px);
-    height: min(40svh, 400px);
-  }
-}
-
-/* Pagination dots */
-.work-pagination {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(1.25rem, 4vh, 2.5rem);
-  z-index: 12;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  transform: translateX(-50%);
-}
-
-.work-dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: transparent;
-  cursor: pointer;
-  transition:
-    width 0.4s var(--ease-out),
-    background 0.4s var(--ease-soft),
-    border-color 0.4s var(--ease-soft);
-}
-
-.work-dot:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-.work-dot.is-active {
-  width: 26px;
-  background: var(--text);
-  border-color: var(--text);
-}
-
-.work-dot:focus-visible {
-  outline: 2px solid var(--line-strong);
-  outline-offset: 3px;
-}
-
-/* Static fallback for missing GSAP or reduced motion */
-.work-grid.is-static {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: clamp(1.25rem, 3vw, 2rem);
-  width: 100%;
-  height: auto;
-}
-
-.work-grid.is-static>.project {
-  position: relative;
-  top: auto;
-  left: auto;
-  width: auto;
-  height: auto;
-  transform: none !important;
-  opacity: 1 !important;
-}
-
-.work-stage.is-static {
-  height: auto;
-  display: block;
-  overflow: visible;
-  perspective: none;
-}
-
-.work-stage.is-static .work-pagination {
-  display: none;
-}
+/* Responsive project cards, carousel and image gallery: work.css. */
 
 /* ---------- Highlights ---------- */
 .highlights {
@@ -2581,50 +2207,7 @@ html[dir="rtl"] .storyline-index {
     opacity: 1;
   }
 
-  .work-grid {
-    perspective: none;
-  }
 
-  .project-media img {
-    transform: none !important;
-  }
-
-  /* Ã˜Â¥Ã™â€žÃ˜ÂºÃ˜Â§Ã˜Â¡ Ã˜Â§Ã™â€žÃ™â‚¬ Coverflow Ã™Ë†Ã˜Â§Ã™â€žÃ™â‚¬ Pinning */
-  .work-stage {
-    height: auto;
-    display: block;
-    overflow: visible;
-    perspective: none;
-  }
-
-  .work-heading {
-    position: relative;
-    inset: auto;
-    width: auto;
-    margin: 0 0 clamp(1.75rem, 4vw, 3rem);
-  }
-
-  .work-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: clamp(1.25rem, 3vw, 2rem);
-    width: 100%;
-    height: auto;
-  }
-
-  .work-grid>.project {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: auto;
-    height: auto;
-    transform: none !important;
-    opacity: 1 !important;
-  }
-
-  .work-pagination {
-    display: none;
-  }
 }
 
 #approach {
@@ -4932,40 +4515,48 @@ html[dir="rtl"] .footer-inner {
   text-align: right;
 }
 
+/* Keep the language control beside the links, never on a row of its own.
+   On the narrowest screens only the link group wraps; every link stays visible. */
 @media (max-width: 760px) {
   .nav {
-    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding-block: 0.375rem;
+    padding-inline: clamp(0.75rem, 3vw, 1.25rem);
   }
 
   .nav-links {
-    width: 100%;
+    flex: 0 1 auto;
+    min-width: 0;
+    width: auto;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 0.125rem clamp(0.5rem, 1.6vw, 0.75rem);
   }
 
-  .language-switch {
-    flex: 0 0 auto;
+  .nav-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
   }
+
+  .nav-links::after { bottom: -0.125rem; max-width: 100%; }
+
+  .language-switch {
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .language-switch__globe { width: 22px; height: 22px; }
 }
 
-@media (max-width: 480px) {
-  .nav {
-    flex-direction: column;
-    gap: .65rem;
-  }
-
-  .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: .65rem 1rem;
-  }
-
-  .language-switch {
-    width: 40px;
-    min-width: 40px;
-    height: 40px;
-    min-height: 40px;
-  }
+@media (max-width: 400px) {
+  .nav-links { column-gap: 0.25rem; }
 }
 
 @media (max-width: 560px) {

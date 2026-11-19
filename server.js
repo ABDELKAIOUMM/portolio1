@@ -328,11 +328,13 @@ function serveStatic(req, res, url) {
 
     const ext = path.extname(filePath).toLowerCase();
     const type = MIME[ext] || "application/octet-stream";
-    const noStore = /\.(json|js|html)$/.test(ext);
+    // Preview code changes together: caching CSS for an hour while JS/HTML
+    // revalidate can leave a previously opened preview on the old layout.
+    const editable = /\.(json|js|html|css)$/.test(ext);
     res.writeHead(200, {
       "Content-Type": type,
       "Content-Length": stats.size,
-      "Cache-Control": noStore ? "no-cache" : "public, max-age=3600"
+      "Cache-Control": editable ? "no-store" : "public, max-age=3600"
     });
     fs.createReadStream(filePath).pipe(res);
   });

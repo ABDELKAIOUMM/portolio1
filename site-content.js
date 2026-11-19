@@ -196,9 +196,10 @@
     var work = content.work || {};
     var section = document.getElementById("work");
     var grid = document.getElementById("workGrid");
-    var pagination = document.getElementById("workPagination");
-    if (!section || !grid) return;
+    if (!section || !grid || !window.ProjectMedia) return;
 
+    var t = function (key, values) { return window.siteI18n ? window.siteI18n.t(key, values) : key; };
+    var digits = function (value) { return window.siteI18n ? window.siteI18n.localizeDigits(value) : String(value); };
     var eyebrow = section.querySelector(".eyebrow");
     var heading = section.querySelector(".section-title");
     var intro = section.querySelector(":scope > p");
@@ -208,106 +209,95 @@
 
     var items = visible(work.items);
     var existing = Array.prototype.slice.call(grid.querySelectorAll(":scope > .project"));
-    var template = existing[0];
-
     items.forEach(function (item, index) {
-      var node = existing[index] || (template ? template.cloneNode(true) : null);
-      if (!node) return;
-
-      var url = item.url || "";
+      var node = existing[index] || el("article", "project");
       var title = pick(item.title, l);
+      var url = /^https?:\/\//i.test(item.url || "") ? item.url : "";
+      var cover = window.ProjectMedia.cover(item);
+      var photoCount = window.ProjectMedia.count(item);
       node.dataset.url = url;
-      node.dataset.contentId = item.id || "";
-      if (item.image) node.dataset.shot = item.image;
-      else node.removeAttribute("data-shot");
+      node.dataset.contentId = item.id || "project-" + index;
+      // The work carousel owns visibility; the generic reveal animation must
+      // not leave native/mobile cards at opacity zero after a rerender.
+      node.removeAttribute("data-reveal");
+      node.setAttribute("role", "group");
+      node.setAttribute("aria-label", digits(index + 1) + " / " + digits(items.length));
+      node.replaceChildren();
 
-      var media = node.querySelector(".project-media");
-      if (media) {
-        if (url) {
-          media.setAttribute("href", url);
-          media.removeAttribute("tabindex");
-          media.removeAttribute("aria-hidden");
-        } else {
-          media.removeAttribute("href");
-          media.setAttribute("tabindex", "-1");
-          media.setAttribute("aria-hidden", "true");
-        }
-        media.classList.remove("is-fallback");
-        media.style.backgroundImage = "";
-        var badge = media.querySelector(".project-badge");
-        if (badge) badge.remove();
+      var preview = el("div", "project-preview");
+      var bar = el("div", "project-window-bar");
+      bar.setAttribute("aria-hidden", "true");
+      var windowDots = el("span", "project-window-dots");
+      for (var dot = 0; dot < 3; dot += 1) windowDots.appendChild(el("i"));
+      var domain = "";
+      try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch (error) { /* no live URL */ }
+      bar.append(windowDots, el("span", "project-domain", domain || t("project.details")));
+      if (photoCount) bar.appendChild(el("span", "project-photo-count", t(photoCount === 1 ? "project.photo" : "project.photos", { count: digits(photoCount) })));
 
-        var img = media.querySelector("img");
-        if (!img) {
-          img = document.createElement("img");
-          img.width = 1200;
-          img.height = 750;
-          img.loading = index > 1 ? "lazy" : "eager";
-          img.decoding = "async";
-          media.appendChild(img);
-        }
-        img.setAttribute("src", item.image || DEFAULT_PROJECT_IMAGE);
-        img.setAttribute("alt", title ? title + " — " + pick(work.eyebrow, l) : title);
-        img.removeAttribute("data-i18n-alt");
+      var media = el("button", "project-media");
+      media.type = "button";
+      media.dataset.projectGallery = node.dataset.contentId;
+      media.setAttribute("aria-label", t("project.openGallery", { title: title }));
+      media.setAttribute("aria-haspopup", "dialog");
+      media.setAttribute("aria-controls", "projectGallery");
+      var img = document.createElement("img");
+      img.width = 1200;
+      img.height = 750;
+      img.loading = index > 1 ? "lazy" : "eager";
+      img.decoding = "async";
+      img.src = cover || DEFAULT_PROJECT_IMAGE;
+      img.alt = title;
+      img.addEventListener("error", function () {
+        media.classList.add("is-fallback");
+        if (img.getAttribute("src") !== DEFAULT_PROJECT_IMAGE) img.src = DEFAULT_PROJECT_IMAGE;
+      });
+      var openIcon = el("span", "project-media-open", "⤢");
+      openIcon.setAttribute("aria-hidden", "true");
+      media.append(img, openIcon);
+      preview.append(bar, media);
+
+      var body = el("div", "project-body");
+      var h3 = el("h3", null, title);
+      h3.title = title;
+      body.append(h3, el("p", "project-summary", pick(item.copy, l)));
+      var tags = el("ul", "project-tags");
+      var allTags = (Array.isArray(item.tags) ? item.tags : []).map(function (tag) { return pick(tag, l).trim(); }).filter(Boolean);
+      allTags.slice(0, 3).forEach(function (tag) { tags.appendChild(el("li", null, tag)); });
+      if (allTags.length > 3) tags.appendChild(el("li", null, "+" + digits(allTags.length - 3)));
+      tags.hidden = !allTags.length;
+      body.appendChild(tags);
+
+      var actions = el("div", "project-actions");
+      var galleryButton = el("button", "project-gallery-trigger", t("project.view"));
+      galleryButton.type = "button";
+      galleryButton.dataset.projectGallery = node.dataset.contentId;
+      galleryButton.setAttribute("aria-haspopup", "dialog");
+      galleryButton.setAttribute("aria-controls", "projectGallery");
+      actions.appendChild(galleryButton);
+      if (url) {
+        var link = el("a", "project-link");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        var arrow = el("span", null, "↗");
+        arrow.setAttribute("aria-hidden", "true");
+        link.append(el("span", null, pick(work.visitLabel, l) || t("project.visit")), arrow);
+        actions.appendChild(link);
       }
-
-      var body = node.querySelector(".project-body");
-      if (body) {
-        var h3 = body.querySelector("h3");
-        if (h3) h3.textContent = title;
-
-        var copy = body.querySelector("p");
-        if (copy) {
-          copy.textContent = pick(item.copy, l);
-          copy.removeAttribute("data-i18n");
-        }
-
-        var tagList = body.querySelector(".project-tags");
-        if (tagList) {
-          tagList.replaceChildren();
-          (Array.isArray(item.tags) ? item.tags : []).forEach(function (tag) {
-            var text = pick(tag, l).trim();
-            if (text) tagList.appendChild(el("li", null, text));
-          });
-          tagList.hidden = !tagList.children.length;
-        }
-
-        var link = body.querySelector(".project-link");
-        if (link) {
-          if (url) {
-            link.setAttribute("href", url);
-            link.hidden = false;
-            link.replaceChildren();
-            link.appendChild(el("span", null, pick(work.visitLabel, l) || "Visit site"));
-            var arrow = el("span", null, "↗");
-            arrow.setAttribute("aria-hidden", "true");
-            link.appendChild(arrow);
-          } else {
-            link.hidden = true;
-            link.removeAttribute("href");
-          }
-        }
-      }
-
+      body.appendChild(actions);
+      node.append(preview, body);
       node.classList.add("is-visible", "is-settled");
       if (!node.parentNode) grid.appendChild(node);
     });
-
-    existing.slice(items.length).forEach(function (node) {
-      node.remove();
-    });
-
-    if (pagination) {
-      pagination.replaceChildren();
-      pagination.hidden = items.length < 2;
-    }
-
+    existing.slice(items.length).forEach(function (node) { node.remove(); });
     grid.classList.toggle("work-grid--empty", !items.length);
     if (!items.length) {
-      grid.replaceChildren();
-      var empty = el("p", "work-empty", pick(work.emptyLabel, l));
-      grid.appendChild(empty);
+      grid.replaceChildren(el("p", "work-empty", pick(work.emptyLabel, l)));
+    } else {
+      var empty = grid.querySelector(".work-empty");
+      if (empty) empty.remove();
     }
+    document.dispatchEvent(new CustomEvent("site-work-rendered"));
   }
 
   /* ---------------- Storyline / process steps ---------------- */

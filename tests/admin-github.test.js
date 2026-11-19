@@ -73,3 +73,35 @@ test("preserves GitHub API errors for the dashboard to report", async () => {
     code: 403
   });
 });
+
+test("publishing preserves both galleries in JSON and the bundled snapshot", async () => {
+  const writes = [];
+  const gallery = { site: ["assets/uploads/home.png", "assets/uploads/mobile.png"], dashboard: ["assets/uploads/admin.png"] };
+  const github = createPublisher(async (url, options) => {
+    if (options.method === "PUT") {
+      writes.push(JSON.parse(options.body));
+      return { ok: true, status: 200, json: async () => ({ commit: { html_url: "https://github.com/example/portfolio/commit/test" } }) };
+    }
+    assert.equal(options.cache, "no-store", "SHA reads must bypass the browser cache");
+    return { ok: true, status: 200, json: async () => ({ content: Buffer.from("{}").toString("base64"), sha: "current-sha" }) };
+  });
+  await github.publish({ work: { items: [{ id: "store", image: gallery.site[0], gallery }] } });
+  assert.equal(writes.length, 2);
+  assert.deepEqual(JSON.parse(Buffer.from(writes[0].content, "base64").toString("utf8")).work.items[0].gallery, gallery);
+  const context = { window: {} };
+  vm.runInNewContext(Buffer.from(writes[1].content, "base64").toString("utf8"), context);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.window.__SITE_CONTENT__.work.items[0].gallery)), gallery);
+});
+
+test("a conflicting save is reported, not blindly retried over newer content", async () => {
+  let writes = 0;
+  const github = createPublisher(async (url, options) => {
+    if (options.method === "PUT") {
+      writes += 1;
+      return { ok: false, status: 409, json: async () => ({ message: "content/site.json does not match" }) };
+    }
+    return { ok: true, status: 200, json: async () => ({ content: Buffer.from("{}").toString("base64"), sha: "old-sha" }) };
+  });
+  await assert.rejects(github.publish({ work: { items: [] } }), { code: 409 });
+  assert.equal(writes, 1);
+});
