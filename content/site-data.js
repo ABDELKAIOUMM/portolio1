@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-19T17:22:56.947Z",
+  "updatedAt": "2026-11-19T17:23:05.113Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -201,7 +201,7 @@ window.__SITE_CONTENT__ = {
           }
         ],
         "visible": true,
-        "updatedAt": "2026-11-19T17:22:56.944Z",
+        "updatedAt": "2026-11-19T17:23:05.111Z",
         "gallery": {
           "site": [
             "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
