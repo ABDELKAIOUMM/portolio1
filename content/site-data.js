@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-17T18:53:04.132Z",
+  "updatedAt": "2026-11-19T17:17:46.050Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -201,7 +201,25 @@ window.__SITE_CONTENT__ = {
           }
         ],
         "visible": true,
-        "updatedAt": "2026-11-17T18:48:24.093Z"
+        "updatedAt": "2026-11-19T17:17:44.298Z",
+        "gallery": {
+          "site": [
+            "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev"
+          ],
+          "dashboard": [
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.06.12-PM-mwnszmx3.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.50-PM-mwnszp48.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.31-PM-mwnszr6k.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.16-PM-mwnszt3n.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.00-PM-mwnszy8s.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.41-PM-mwnszzvc.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.21-PM-mwnt01ey.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.49-PM-mwnt02v3.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.31-PM-mwnt04gy.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.12-PM-mwnt05wv.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.02.54-PM-mwnt07j1.jpg"
+          ]
+        }
       },
       {
         "id": "vercel",
