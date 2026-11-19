@@ -28,7 +28,9 @@
     dirty: false,
     activePanel: "home",
     projectSearch: "",
-    editingProjectId: null
+    editingProjectId: null,
+    uploading: false,
+    quickProjectImage: ""
   };
 
   /* ---------------- utilities ---------------- */
@@ -221,8 +223,8 @@
     }
 
     state.content = normalize(draft || remote);
-    state.original = clone(state.content);
-    state.dirty = Boolean(draft && remote && draft.updatedAt !== remote.updatedAt);
+    state.original = clone(normalize(remote || draft));
+    state.dirty = Boolean(draft && (!remote || JSON.stringify(state.content) !== JSON.stringify(normalize(remote))));
     if (!draft && !remote) {
       toast("مفيش محتوى محفوظ — ابدأ من الصفر أو استورد site.json.", "warn");
     }
@@ -258,10 +260,21 @@
 
   async function saveContent() {
     if (state.saving) return;
+    if (state.uploading) { toast("انتظر حتى يكتمل رفع الصور قبل النشر.", "warn"); return; }
+    if (state.editingProjectId && !el("projectEditor").hidden) {
+      const form = el("projectForm");
+      if (!form.reportValidity() || !readProjectFields(form, projectById(state.editingProjectId), true)) return;
+    }
     state.saving = true;
     const button = el("saveBtn");
     button.classList.add("is-busy");
     q(".btn__label", button).textContent = "جارٍ الحفظ…";
+    // Keep the published payload consistent with what the editor shows while
+    // the network request is in flight. Restore each control's previous state.
+    const lockedFields = qa("input, textarea, select, button", q(".admin-body")).map((node) => ({ node, disabled: node.disabled }));
+    lockedFields.forEach(({ node }) => { node.disabled = true; });
+    const undoWasDisabled = el("undoBtn").disabled;
+    el("undoBtn").disabled = true;
 
     state.content.updatedAt = nowISO();
     const payload = clone(state.content);
@@ -297,6 +310,8 @@
       } else {
         state.original = clone(state.content);
         markClean(state.content.updatedAt);
+        // Offline saves must remain available on the next visit as well.
+        localStorage.setItem(LS_KEY, JSON.stringify(state.content));
         toast(
           state.mode === "offline" && !(window.GitHubPublish && window.GitHubPublish.configured())
             ? "تم الحفظ في المتصفح فقط. فعّل GitHub من تبويب «الإعدادات» عشان تنشر."
@@ -306,9 +321,12 @@
       }
       renderStats();
     } catch (error) {
+      markDirty(); // Keep the full image collections and pending edits after a failed publish.
       toast("فشل الحفظ: " + error.message, "error");
     } finally {
       state.saving = false;
+      lockedFields.forEach(({ node, disabled }) => { if (node.isConnected) node.disabled = disabled; });
+      el("undoBtn").disabled = undoWasDisabled;
       button.classList.remove("is-busy");
       q(".btn__label", button).textContent = "حفظ التعديلات";
     }
@@ -323,7 +341,15 @@
     });
   }
 
-  async function uploadImage(file) {
+  let imageUploadQueue = Promise.resolve();
+  function uploadImage(file, strict) {
+    const task = () => performImageUpload(file, strict);
+    const result = imageUploadQueue.then(task, task);
+    imageUploadQueue = result.catch(() => {});
+    return result;
+  }
+
+  async function performImageUpload(file, strict) {
     const dataUrl = await readFileAsDataURL(file);
 
     // GitHub mode: commit the image into the repo so it survives reloads
@@ -332,6 +358,7 @@
       try {
         return await window.GitHubPublish.uploadImage(file, dataUrl);
       } catch (error) {
+        if (strict) throw error;
         toast("فشل رفع الصورة على GitHub: " + error.message, "error");
       }
     }
@@ -343,11 +370,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: file.name, dataUrl })
         });
-        if (response.ok) {
-          const result = await response.json();
-          if (result.path) return result.path;
-        }
-      } catch (error) { /* fall through to inline storage */ }
+        const result = await response.json();
+        if (response.ok && result.path) return result.path;
+        throw new Error(result.error || "تعذّر حفظ الصورة على السيرفر");
+      } catch (error) { if (strict) throw error; }
     }
     toast("الصورة اتحفظت داخل ملف المحتوى (بدون سيرفر).", "warn");
     return dataUrl;
@@ -439,6 +465,7 @@
       copy: bi("", ""),
       url: "",
       image: "",
+      gallery: { site: [], dashboard: [] },
       tags: [],
       visible: true
     };
@@ -467,13 +494,18 @@
 
       const media = document.createElement("div");
       media.className = "project-card__media";
-      if (item.image) media.style.backgroundImage = 'url("' + item.image.replace(/"/g, "%22") + '")';
+      const cover = window.ProjectMedia.cover(item);
+      if (cover) media.style.backgroundImage = 'url("' + cover.replace(/"/g, "%22") + '")';
       media.innerHTML =
         '<span class="project-card__badge' +
         (item.visible === false ? " project-card__badge--hidden" : "") +
         '">' +
         (item.visible === false ? "مخفي" : "ظاهر") +
         "</span>";
+      const photoCount = document.createElement("span");
+      photoCount.className = "project-card__photos";
+      photoCount.textContent = window.ProjectMedia.count(item) + " صور";
+      media.appendChild(photoCount);
 
       const body = document.createElement("div");
       body.className = "project-card__body";
@@ -531,6 +563,7 @@
   }
 
   function openProjectEditor(id) {
+    if (state.uploading) { toast("انتظر حتى يكتمل رفع الصور.", "warn"); return; }
     const item = id ? projectById(id) : newProject();
     if (!item) return;
     if (!id) {
@@ -552,14 +585,17 @@
     form.elements.copy_ar.value = pickLang(item.copy, "ar");
     form.elements.copy_en.value = pickLang(item.copy, "en");
     form.elements.url.value = item.url || "";
-    form.elements.image.value = item.image && !item.image.startsWith("data:") ? item.image : "";
+    const cover = window.ProjectMedia.cover(item);
+    form.elements.image.value = cover && !cover.startsWith("data:") ? cover : "";
     form.elements.tags.value = (item.tags || [])
       .map((tag) => pickLang(tag, "en") || pickLang(tag, "ar"))
       .filter(Boolean)
       .join(", ");
     form.elements.visible.checked = item.visible !== false;
 
-    updateProjectPreview(item.image);
+    updateProjectPreview(cover);
+    renderProjectGalleryEditor(item);
+    el("projectUploadStatus").textContent = "";
 
     drawer.hidden = false;
     drawer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -588,40 +624,179 @@
   }
 
   function closeProjectEditor() {
+    if (state.uploading) { toast("انتظر حتى يكتمل رفع الصور.", "warn"); return; }
     const drawer = el("projectEditor");
     if (drawer) drawer.hidden = true;
     state.editingProjectId = null;
   }
 
-  function saveProjectFromForm() {
-    const form = el("projectForm");
-    const id = form.elements.id.value;
-    const item = projectById(id);
-    if (!item) return;
-
+  function readProjectFields(form, item, validate) {
+    if (!item) return false;
+    const rawImage = form.elements.image.value.trim();
+    const image = window.ProjectMedia.source(rawImage);
+    if (validate && rawImage && !image) {
+      toast("رابط صورة الغلاف غير صالح.", "error");
+      form.elements.image.focus();
+      return false;
+    }
     const fallbackTitle = form.elements.title_en.value.trim() || form.elements.title_ar.value.trim();
-    const arTitle = form.elements.title_ar.value.trim() || fallbackTitle;
-    const enTitle = form.elements.title_en.value.trim() || form.elements.title_ar.value.trim();
-    const arCopy = form.elements.copy_ar.value.trim() || form.elements.copy_en.value.trim();
-    const enCopy = form.elements.copy_en.value.trim() || form.elements.copy_ar.value.trim();
-
-    item.title = bi(enTitle, arTitle);
-    item.copy = bi(enCopy, arCopy);
+    item.title = bi(form.elements.title_en.value.trim() || fallbackTitle, form.elements.title_ar.value.trim() || fallbackTitle);
+    item.copy = bi(form.elements.copy_en.value.trim() || form.elements.copy_ar.value.trim(), form.elements.copy_ar.value.trim() || form.elements.copy_en.value.trim());
     item.url = form.elements.url.value.trim();
-    item.image = form.elements.image.value.trim() || (item.image && item.image.startsWith("data:") ? item.image : "");
-    item.tags = form.elements.tags.value
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean)
-      .map((tag) => bi(tag, tag));
+    // Do not turn every partially typed URL into a separate gallery image.
+    if (validate) {
+      // Capture a legacy cover before replacing it so typing a new cover URL
+      // never discards the project's existing single-image screenshot.
+      item.gallery = window.ProjectMedia.normalize(item);
+      item.image = image || (item.image && item.image.startsWith("data:") ? item.image : "");
+      item.gallery = window.ProjectMedia.normalize(item);
+      item.image = window.ProjectMedia.cover(item);
+    }
+    item.tags = form.elements.tags.value.split(",").map((tag) => tag.trim()).filter(Boolean).map((tag) => bi(tag, tag));
     item.visible = form.elements.visible.checked;
     item.updatedAt = nowISO();
+    return true;
+  }
 
+  function saveProjectFromForm() {
+    if (state.uploading) { toast("انتظر حتى يكتمل رفع الصور.", "warn"); return; }
+    const form = el("projectForm");
+    if (!readProjectFields(form, projectById(form.elements.id.value), true)) return;
     markDirty();
     renderProjects();
     renderStats();
     closeProjectEditor();
-    toast("تم تحديث بيانات العمل. اضغط «حفظ التعديلات» للنشر.");
+    toast("تم تحديث بيانات العمل ومعرض الصور. اضغط «حفظ التعديلات» للنشر.");
+  }
+
+  function syncProjectCover(item) {
+    const form = el("projectForm");
+    form.elements.image.value = item.image && !item.image.startsWith("data:") ? item.image : "";
+    updateProjectPreview(window.ProjectMedia.cover(item));
+  }
+
+  function applyProjectGallery(item, gallery) {
+    item.gallery = { site: window.ProjectMedia.images(gallery.site), dashboard: window.ProjectMedia.images(gallery.dashboard) };
+    const all = item.gallery.site.concat(item.gallery.dashboard);
+    if (!all.includes(item.image)) item.image = all[0] || "";
+    item.updatedAt = nowISO();
+    markDirty();
+    renderProjects();
+    if (state.editingProjectId === item.id) {
+      syncProjectCover(item);
+      renderProjectGalleryEditor(item);
+    }
+  }
+
+  function renderProjectGalleryEditor(item) {
+    const gallery = window.ProjectMedia.normalize(item);
+    const cover = window.ProjectMedia.cover(item);
+    el("projectGalleryTotal").textContent = (gallery.site.length + gallery.dashboard.length) + " صور";
+    ["site", "dashboard"].forEach((group) => {
+      const list = q('[data-gallery-list="' + group + '"]');
+      list.replaceChildren();
+      q('[data-gallery-count="' + group + '"]').textContent = gallery[group].length;
+      q('[data-gallery-empty="' + group + '"]').hidden = gallery[group].length > 0;
+      gallery[group].forEach((src, index) => {
+        const tile = document.createElement("article");
+        tile.className = "gallery-editor-image" + (src === cover ? " is-cover" : "");
+        const image = document.createElement("img");
+        image.src = src;
+        image.alt = (group === "site" ? "صورة الموقع " : "صورة لوحة التحكم ") + (index + 1);
+        image.loading = "lazy";
+        image.decoding = "async";
+        const tools = document.createElement("div");
+        tools.className = "gallery-editor-image__tools";
+        const button = (label, action, disabled, className) => {
+          const node = document.createElement("button");
+          node.type = "button";
+          node.className = className || "";
+          node.textContent = label;
+          node.disabled = Boolean(disabled || state.uploading);
+          node.addEventListener("click", action);
+          return node;
+        };
+        const chooseCover = button(src === cover ? "✓ الغلاف" : "اختيار كغلاف", () => {
+          if (src === item.image) return;
+          item.image = src;
+          applyProjectGallery(item, gallery);
+          const selected = q(".gallery-editor-image.is-cover .gallery-set-cover");
+          if (selected) selected.focus({ preventScroll: true });
+        }, false, "gallery-set-cover");
+        chooseCover.setAttribute("aria-pressed", String(src === cover));
+        chooseCover.setAttribute("aria-label", "اختيار الصورة " + (index + 1) + " كغلاف");
+        const move = (direction) => {
+          const updated = window.ProjectMedia.normalize(item);
+          const to = index + direction;
+          [updated[group][index], updated[group][to]] = [updated[group][to], updated[group][index]];
+          applyProjectGallery(item, updated);
+          const target = q('[data-gallery-list="' + group + '"]').children[to];
+          if (target) target.querySelector(direction < 0 ? '[data-move="later"]' : '[data-move="earlier"]').focus({ preventScroll: true });
+        };
+        const earlier = button("↑", () => move(-1), index === 0);
+        earlier.dataset.move = "earlier";
+        earlier.setAttribute("aria-label", "تقديم الصورة " + (index + 1));
+        earlier.title = "تقديم الصورة";
+        const later = button("↓", () => move(1), index === gallery[group].length - 1);
+        later.dataset.move = "later";
+        later.setAttribute("aria-label", "تأخير الصورة " + (index + 1));
+        later.title = "تأخير الصورة";
+        const remove = button("حذف", () => {
+          const updated = window.ProjectMedia.normalize(item);
+          updated[group].splice(index, 1);
+          applyProjectGallery(item, updated);
+        }, false, "gallery-remove-image");
+        remove.setAttribute("aria-label", "حذف الصورة " + (index + 1));
+        tools.append(earlier, later, remove);
+        tile.append(image, chooseCover, tools);
+        list.appendChild(tile);
+      });
+    });
+  }
+
+  function setProjectUploadBusy(busy) {
+    state.uploading = busy;
+    const form = el("projectForm");
+    qa('button, [data-gallery-upload], [data-image-picker], [data-gallery-url]', form).forEach((node) => { node.disabled = busy; });
+    el("saveBtn").disabled = busy || state.saving;
+    el("undoBtn").disabled = busy;
+    form.setAttribute("aria-busy", String(busy));
+  }
+
+  async function uploadProjectImages(input, group, makeCover) {
+    const files = Array.from(input.files || []);
+    if (!files.length || state.uploading) return;
+    if (state.saving) { input.value = ""; toast("انتظر حتى تنتهي عملية النشر الحالية.", "warn"); return; }
+    const item = projectById(state.editingProjectId);
+    if (!item) return;
+    setProjectUploadBusy(true);
+    let added = 0;
+    let failed = 0;
+    try {
+      for (let i = 0; i < files.length; i += 1) {
+        const file = files[i];
+        el("projectUploadStatus").textContent = "جارٍ رفع الصورة " + (i + 1) + " من " + files.length + "…";
+        try {
+          if (!/^image\/(png|jpeg|webp|gif|svg\+xml)$/.test(file.type)) throw new Error("نوع الصورة غير مدعوم");
+          if (file.size > 6 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 6 MB");
+          const src = await uploadImage(file, true);
+          const gallery = window.ProjectMedia.normalize(item);
+          if (!gallery[group].includes(src)) gallery[group].push(src);
+          if (makeCover || !window.ProjectMedia.cover(item)) item.image = src;
+          applyProjectGallery(item, gallery);
+          added += 1;
+        } catch (error) {
+          failed += 1;
+          toast(file.name + ": " + error.message, "error");
+        }
+      }
+    } finally {
+      input.value = "";
+      setProjectUploadBusy(false);
+      if (state.editingProjectId === item.id) renderProjectGalleryEditor(item);
+      el("projectUploadStatus").textContent = "تمت إضافة " + added + " صور" + (failed ? "، وتعذّر رفع " + failed + " صور" : "") + ". اضغط «حفظ التعديلات» للنشر.";
+      if (added) toast("الصور جاهزة. اضغط «حفظ التعديلات» لنشرها.");
+    }
   }
 
   function deleteProject() {
@@ -650,9 +825,11 @@
     const item = newProject();
     item.title = bi(title, title);
     item.url = url;
-    item.image = url
+    item.image = state.quickProjectImage || (url
       ? "https://image.thum.io/get/width/1200/crop/750/noanimate/" + url.replace(/\/$/, "")
-      : "";
+      : "");
+    item.gallery = window.ProjectMedia.normalize(item);
+    state.quickProjectImage = "";
     state.content.work.items.unshift(item);
     markDirty();
     renderProjects();
@@ -1058,7 +1235,6 @@
     renderStoryEditor();
     renderSkillsEditor();
     renderStats();
-    markClean(state.content.updatedAt);
   }
 
   function wireEvents() {
@@ -1079,6 +1255,8 @@
     el("undoBtn").addEventListener("click", () => {
       if (!window.confirm("الرجوع لآخر محتوى محفوظ؟ هتضيع التعديلات غير المحفوظة.")) return;
       state.content = clone(state.original);
+      closeProjectEditor();
+      markClean(state.content.updatedAt);
       renderAll();
       toast("تم الرجوع لآخر نسخة محفوظة.");
     });
@@ -1101,12 +1279,36 @@
 
     q("[data-delete-project]").addEventListener("click", deleteProject);
     q("[data-clear-image]").addEventListener("click", () => {
-      const form = el("projectForm");
-      form.elements.image.value = "";
-      const item = projectById(form.elements.id.value);
-      if (item) item.image = "";
-      updateProjectPreview("");
-      markDirty();
+      const item = projectById(state.editingProjectId);
+      if (!item) return;
+      const cover = window.ProjectMedia.cover(item);
+      const gallery = window.ProjectMedia.normalize(item);
+      gallery.site = gallery.site.filter((src) => src !== cover);
+      gallery.dashboard = gallery.dashboard.filter((src) => src !== cover);
+      applyProjectGallery(item, gallery);
+    });
+
+    el("projectForm").addEventListener("input", (event) => {
+      if (!event.target.name || event.target.type === "file") return;
+      const item = projectById(state.editingProjectId);
+      if (item && readProjectFields(el("projectForm"), item, false)) markDirty();
+    });
+    qa("[data-gallery-upload]").forEach((input) => {
+      input.addEventListener("change", () => uploadProjectImages(input, input.dataset.galleryUpload, false));
+    });
+    qa("[data-gallery-add-url]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = projectById(state.editingProjectId);
+        const group = button.dataset.galleryAddUrl;
+        const input = q('[data-gallery-url="' + group + '"]');
+        const src = window.ProjectMedia.source(input.value);
+        if (!src) { toast("أدخل رابط صورة صالحًا.", "warn"); input.focus(); return; }
+        if (!item) return;
+        const gallery = window.ProjectMedia.normalize(item);
+        if (!gallery[group].includes(src)) gallery[group].push(src);
+        applyProjectGallery(item, gallery);
+        input.value = "";
+      });
     });
 
     el("quickProjectForm").addEventListener("submit", (event) => {
@@ -1122,8 +1324,7 @@
         toast("جارٍ رفع الصورة…", "warn");
         const path = await uploadImage(file);
         const form = el("quickProjectForm");
-        const pending = state.content.work.items[0];
-        if (pending) pending.image = path;
+        state.quickProjectImage = path;
         const titleInput = form.elements.title;
         if (!titleInput.value) titleInput.focus();
         toast("الصورة جاهزة — اكتب اسم المشروع واضغط إضافة.");
@@ -1145,19 +1346,8 @@
       event.target.value = "";
     });
 
-    q("#projectForm [data-image-picker]").addEventListener("change", async (event) => {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      toast("جارٍ رفع الصورة…", "warn");
-      const path = await uploadImage(file);
-      const form = el("projectForm");
-      form.elements.image.value = path.startsWith("data:") ? "" : path;
-      const item = projectById(form.elements.id.value);
-      if (item) item.image = path;
-      updateProjectPreview(path);
-      markDirty();
-      toast("تم تحديث صورة العمل. اضغط «حفظ العمل».");
-      event.target.value = "";
+    q("#projectForm [data-image-picker]").addEventListener("change", (event) => {
+      uploadProjectImages(event.target, "site", true);
     });
 
     el("newServiceBtn").addEventListener("click", () => {
@@ -1354,9 +1544,11 @@
     wireEvents();
     wireGithub();
     setConnectionBadge();
-    markClean(state.content.updatedAt);
     if (state.dirty) {
+      markDirty();
       toast("فيه تعديلات غير محفوظة من جلسة سابقة. راجعها واضغط حفظ.", "warn");
+    } else {
+      markClean(state.content.updatedAt);
     }
   }
 

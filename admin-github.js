@@ -161,7 +161,8 @@
     var url = repoPath() + "/contents/" + path.split("/").map(encodeURIComponent).join("/") +
       "?ref=" + encodeURIComponent(state.branch);
     try {
-      var file = await request(url);
+      // Always obtain the current blob SHA before saving, never a cached one.
+      var file = await request(url, { cache: "no-store" });
       if (Array.isArray(file)) throw new Error("المسار مجلد مش ملف");
       return { text: base64ToUtf8(file.content), sha: file.sha };
     } catch (error) {

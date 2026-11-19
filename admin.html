@@ -185,7 +185,8 @@
                 <input type="text" name="tags" placeholder="WordPress, WooCommerce, SEO" />
               </label>
               <div class="field field--full">
-                <span>صورة المعاينة</span>
+                <span>صورة الغلاف</span>
+                <p class="field-help">تظهر في بطاقة المشروع. يمكنك أيضًا اختيار أي صورة من المعرض كغلاف.</p>
                 <div class="image-field">
                   <div class="image-field__preview" data-project-preview>
                     <span>لا توجد صورة</span>
@@ -197,11 +198,53 @@
                     </label>
                     <label class="field field--inline">
                       <span>أو رابط صورة</span>
-                      <input type="url" name="image" dir="ltr" placeholder="https://… أو assets/uploads/…" />
+                      <input type="text" inputmode="url" name="image" dir="ltr" placeholder="https://… أو assets/uploads/…" />
                     </label>
                     <button type="button" class="btn btn--ghost btn--danger" data-clear-image>إزالة الصورة</button>
                   </div>
                 </div>
+              </div>
+              <div class="field field--full project-gallery-editor">
+                <div class="gallery-editor-heading">
+                  <div><h3>معرض صور المشروع</h3><p class="field-help">قسّم الصور بين واجهة الموقع ولوحة التحكم. الترتيب هنا هو ترتيب ظهورها للزائر.</p></div>
+                  <span class="gallery-editor-total" id="projectGalleryTotal">0 صور</span>
+                </div>
+                <p class="gallery-upload-status" id="projectUploadStatus" role="status" aria-live="polite"></p>
+                <section class="gallery-manager" data-gallery-manager="site" aria-labelledby="siteGalleryHeading">
+                  <div class="gallery-manager__head">
+                    <div><h4 id="siteGalleryHeading">صور الموقع <span data-gallery-count="site">0</span></h4><p class="field-help">الصفحة الرئيسية، صفحات المنتجات، ونسخة الموبايل.</p></div>
+                    <label class="btn btn--ghost btn--upload gallery-upload-button">
+                      + رفع صور
+                      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" multiple
+                        data-gallery-upload="site" aria-label="رفع صور الموقع" />
+                    </label>
+                  </div>
+                  <div class="gallery-manager__list" data-gallery-list="site"></div>
+                  <p class="gallery-manager__empty" data-gallery-empty="site">لم تُضف صورًا بعد. ارفع عدة صور مرة واحدة أو أضف رابطًا.</p>
+                  <div class="gallery-manager__link">
+                    <label class="field"><span>إضافة صورة برابط</span><input type="text" inputmode="url" dir="ltr"
+                      data-gallery-url="site" placeholder="https://… أو assets/uploads/…" /></label>
+                    <button class="btn btn--ghost btn--small" type="button" data-gallery-add-url="site">إضافة الرابط</button>
+                  </div>
+                </section>
+                <section class="gallery-manager" data-gallery-manager="dashboard" aria-labelledby="dashboardGalleryHeading">
+                  <div class="gallery-manager__head">
+                    <div><h4 id="dashboardGalleryHeading">صور لوحة التحكم <span data-gallery-count="dashboard">0</span></h4><p class="field-help">شاشات الإدارة والإحصائيات وإدارة المحتوى — صور فقط، بدون بيانات دخول.</p></div>
+                    <label class="btn btn--ghost btn--upload gallery-upload-button">
+                      + رفع صور
+                      <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" multiple
+                        data-gallery-upload="dashboard" aria-label="رفع صور لوحة التحكم" />
+                    </label>
+                  </div>
+                  <div class="gallery-manager__list" data-gallery-list="dashboard"></div>
+                  <p class="gallery-manager__empty" data-gallery-empty="dashboard">لم تُضف صورًا بعد. ارفع عدة صور مرة واحدة أو أضف رابطًا.</p>
+                  <div class="gallery-manager__link">
+                    <label class="field"><span>إضافة صورة برابط</span><input type="text" inputmode="url" dir="ltr"
+                      data-gallery-url="dashboard" placeholder="https://… أو assets/uploads/…" /></label>
+                    <button class="btn btn--ghost btn--small" type="button" data-gallery-add-url="dashboard">إضافة الرابط</button>
+                  </div>
+                </section>
+                <p class="field-help">PNG، JPG، WebP، GIF أو SVG • حتى 6 MB للصورة. الصور الجديدة تُنشر بعد الضغط على «حفظ التعديلات».</p>
               </div>
               <div class="form-actions form-actions--split">
                 <label class="switch">
@@ -425,6 +468,7 @@
 
   <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
 
+  <script src="project-media.js"></script>
   <script src="admin-github.js"></script>
   <script src="admin.js"></script>
 </body>
