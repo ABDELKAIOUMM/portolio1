@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-19T17:17:46.050Z",
+  "updatedAt": "2026-11-19T17:22:56.947Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -201,10 +201,16 @@ window.__SITE_CONTENT__ = {
           }
         ],
         "visible": true,
-        "updatedAt": "2026-11-19T17:17:44.298Z",
+        "updatedAt": "2026-11-19T17:22:56.944Z",
         "gallery": {
           "site": [
-            "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev"
+            "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.34-PM-mwntijhs.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.18-PM-mwntimwo.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.01-PM-mwntiofc.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.47-PM-mwntiqdj.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.30-PM-mwntiscb.jpg",
+            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.17-PM-mwntiubz.jpg"
           ],
           "dashboard": [
             "assets/uploads/WhatsApp-Image-2026-11-19-at-7.06.12-PM-mwnszmx3.jpg",
