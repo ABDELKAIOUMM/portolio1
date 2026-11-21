@@ -401,7 +401,11 @@ html.has-project-gallery { overflow: hidden; }
 .gallery-details { display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; padding: 1.75rem 1.5rem; overflow-y: auto; overscroll-behavior: contain; border-inline-start: 1px solid var(--line); background: #101216; }
 .gallery-project-number { color: #8e96a5; font: 0.65rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 0.08em; }
 .gallery-details h2 { margin: 0; color: #f4f5f7; font-family: inherit; font-size: 1.2rem; font-weight: 600; line-height: 1.55; overflow-wrap: anywhere; }
-.gallery-details > p { margin: 0; color: #aeb4bf; font-size: 0.875rem; line-height: 1.85; overflow-wrap: anywhere; }
+.gallery-details > p, .gallery-description p { margin: 0; color: #aeb4bf; font-size: 0.875rem; line-height: 1.85; overflow-wrap: anywhere; }
+.gallery-description { min-width: 0; }
+.gallery-description h3 { margin: 0 0 0.6rem; color: #d7dce5; font-size: 0.75rem; font-weight: 600; line-height: 1.7; }
+.gallery-description p { white-space: pre-line; }
+.gallery-description.is-empty p { color: #8e96a5; }
 .gallery-tags { flex-wrap: wrap; overflow: visible; }
 .gallery-tags li { white-space: normal; overflow-wrap: anywhere; }
 .gallery-visit { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 48px; margin-top: auto; padding: 0.8rem 1rem; border: 1px solid #e4eaf3; border-radius: 8px; background: #e4eaf3; color: #10131a; font-size: 0.8rem; font-weight: 600; text-decoration: none; }

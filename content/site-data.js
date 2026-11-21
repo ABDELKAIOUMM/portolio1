@@ -2,7 +2,7 @@
    The dashboard regenerates this file on every save — edit content via admin.html. */
 window.__SITE_CONTENT__ = {
   "version": 3,
-  "updatedAt": "2026-11-19T17:23:05.113Z",
+  "updatedAt": "2026-11-21T13:17:12.847Z",
   "defaultLanguage": "en",
   "meta": {
     "title": {
@@ -193,7 +193,7 @@ window.__SITE_CONTENT__ = {
           "ar": "متجر عربي (RTL) لبيع الحلويات والتوصيل في الزقازيق وأبو حماد، مبني على Cloudflare Workers مع لوحة تحكم CMS كاملة لإدارة المنتجات والأسعار والتوصيل، وطلب عبر واتساب بحساب تلقائي لرسوم التوصيل."
         },
         "url": "https://red-sweetie.abdlkayomd.workers.dev/",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
+        "image": "",
         "tags": [
           {
             "en": "D1 · JavaScript · HTML/CSS",
@@ -203,28 +203,37 @@ window.__SITE_CONTENT__ = {
         "visible": true,
         "updatedAt": "2026-11-19T17:23:05.111Z",
         "gallery": {
-          "site": [
-            "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.34-PM-mwntijhs.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.18-PM-mwntimwo.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.01-PM-mwntiofc.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.47-PM-mwntiqdj.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.30-PM-mwntiscb.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.17-PM-mwntiubz.jpg"
-          ],
-          "dashboard": [
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.06.12-PM-mwnszmx3.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.50-PM-mwnszp48.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.31-PM-mwnszr6k.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.16-PM-mwnszt3n.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.00-PM-mwnszy8s.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.41-PM-mwnszzvc.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.21-PM-mwnt01ey.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.49-PM-mwnt02v3.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.31-PM-mwnt04gy.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.12-PM-mwnt05wv.jpg",
-            "assets/uploads/WhatsApp-Image-2026-11-19-at-7.02.54-PM-mwnt07j1.jpg"
-          ]
+          "site": [],
+          "dashboard": []
+        },
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.34-PM-mwntijhs.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.18-PM-mwntimwo.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.21.01-PM-mwntiofc.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.47-PM-mwntiqdj.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.30-PM-mwntiscb.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.20.17-PM-mwntiubz.jpg"
+            ],
+            "dashboard": [
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.06.12-PM-mwnszmx3.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.50-PM-mwnszp48.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.31-PM-mwnszr6k.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.16-PM-mwnszt3n.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.05.00-PM-mwnszy8s.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.41-PM-mwnszzvc.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.04.21-PM-mwnt01ey.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.49-PM-mwnt02v3.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.31-PM-mwnt04gy.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.03.12-PM-mwnt05wv.jpg",
+              "assets/uploads/WhatsApp-Image-2026-11-19-at-7.02.54-PM-mwnt07j1.jpg"
+            ]
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://red-sweetie.abdlkayomd.workers.dev"
         }
       },
       {
@@ -238,7 +247,7 @@ window.__SITE_CONTENT__ = {
           "ar": "موقع تسويقي ولوحة تحكم بواجهة داكنة وحركة مدروسة ومكتبة مكونات مصممة للسرعة."
         },
         "url": "https://vercel.com",
-        "image": "assets/uploads/WhatsApp-Image-2026-11-17-at-8.43.24-PM-mwl1jbhz.jpg",
+        "image": "",
         "tags": [
           {
             "en": "Next.js",
@@ -254,7 +263,22 @@ window.__SITE_CONTENT__ = {
           }
         ],
         "visible": false,
-        "updatedAt": "2026-11-17T18:48:37.244Z"
+        "updatedAt": "2026-11-17T18:48:37.244Z",
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "assets/uploads/WhatsApp-Image-2026-11-17-at-8.43.24-PM-mwl1jbhz.jpg"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "assets/uploads/WhatsApp-Image-2026-11-17-at-8.43.24-PM-mwl1jbhz.jpg"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       },
       {
         "id": "stripe",
@@ -267,7 +291,7 @@ window.__SITE_CONTENT__ = {
           "ar": "صفحات منتجات بعروض تفاعلية وتدرجات متحركة ووثائق واضحة وسهلة القراءة مع التوسع."
         },
         "url": "https://stripe.com",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://stripe.com",
+        "image": "",
         "tags": [
           {
             "en": "React",
@@ -282,7 +306,22 @@ window.__SITE_CONTENT__ = {
             "ar": "إمكانية الوصول"
           }
         ],
-        "visible": true
+        "visible": true,
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://stripe.com"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://stripe.com"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       },
       {
         "id": "linear",
@@ -295,7 +334,7 @@ window.__SITE_CONTENT__ = {
           "ar": "واجهات تطبيقات بتدفقات تعتمد على لوحة المفاتيح، وخطوط واضحة، وإدارة حالات لا تثقل التجربة."
         },
         "url": "https://linear.app",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://linear.app",
+        "image": "",
         "tags": [
           {
             "en": "TypeScript",
@@ -310,7 +349,22 @@ window.__SITE_CONTENT__ = {
             "ar": "واجهة المستخدم"
           }
         ],
-        "visible": true
+        "visible": true,
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://linear.app"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://linear.app"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       },
       {
         "id": "figma",
@@ -323,7 +377,7 @@ window.__SITE_CONTENT__ = {
           "ar": "صفحات هبوط وإطلاق مزايا، بتنفيذ دقيق يطابق ملفات التصميم."
         },
         "url": "https://www.figma.com",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.figma.com",
+        "image": "",
         "tags": [
           {
             "en": "HTML/CSS",
@@ -338,7 +392,22 @@ window.__SITE_CONTENT__ = {
             "ar": "تهيئة محركات البحث"
           }
         ],
-        "visible": true
+        "visible": true,
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.figma.com"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.figma.com"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       },
       {
         "id": "tailwind",
@@ -351,7 +420,7 @@ window.__SITE_CONTENT__ = {
           "ar": "موقع توثيق وتسويق بتصميم متجاوب ووضع داكن وتجربة بحث سريعة."
         },
         "url": "https://tailwindcss.com",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://tailwindcss.com",
+        "image": "",
         "tags": [
           {
             "en": "Tailwind",
@@ -366,7 +435,22 @@ window.__SITE_CONTENT__ = {
             "ar": "متجاوب"
           }
         ],
-        "visible": true
+        "visible": true,
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://tailwindcss.com"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://tailwindcss.com"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       },
       {
         "id": "raycast",
@@ -379,7 +463,7 @@ window.__SITE_CONTENT__ = {
           "ar": "موقع منتج بصري غني وتفاعلات دقيقة، مع عناية بمؤشرات Core Web Vitals على مختلف الأجهزة."
         },
         "url": "https://www.raycast.com",
-        "image": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.raycast.com",
+        "image": "",
         "tags": [
           {
             "en": "JavaScript",
@@ -394,7 +478,22 @@ window.__SITE_CONTENT__ = {
             "ar": "مؤشرات Core Web Vitals"
           }
         ],
-        "visible": true
+        "visible": true,
+        "galleryByLanguage": {
+          "ar": {
+            "site": [
+              "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.raycast.com"
+            ],
+            "dashboard": []
+          }
+        },
+        "imageByLanguage": {
+          "ar": "https://image.thum.io/get/width/1200/crop/750/noanimate/https://www.raycast.com"
+        },
+        "gallery": {
+          "site": [],
+          "dashboard": []
+        }
       }
     ],
     "emptyLabel": {

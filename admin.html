@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="admin.css?v=project-locales-1" />
 </head>
 
 <body>
@@ -169,13 +169,24 @@
                 <input type="text" name="title_en" dir="ltr" placeholder="Project name" />
               </label>
               <label class="field field--full">
-                <span>وصف المشروع (عربي)</span>
-                <textarea name="copy_ar" rows="3" dir="rtl" placeholder="إيه اللي عملته في المشروع…"></textarea>
+                <span>وصف الموقع الأساسي (عربي)</span>
+                <textarea name="copy_ar" rows="3" dir="rtl" placeholder="إيه اللي عملته في الموقع…"></textarea>
               </label>
               <label class="field field--full">
-                <span>وصف المشروع (إنجليزي)</span>
-                <textarea name="copy_en" rows="3" dir="ltr" placeholder="What you built…"></textarea>
+                <span>وصف الموقع الأساسي (إنجليزي)</span>
+                <textarea name="copy_en" rows="3" dir="ltr" placeholder="What you built for the website…"></textarea>
               </label>
+              <label class="field field--full">
+                <span>وصف لوحة التحكم (عربي)</span>
+                <textarea name="dashboardCopy_ar" rows="4" dir="rtl" aria-describedby="projectDashboardCopyHelp"
+                  placeholder="اشرح لوحة تحكم المشروع وخصائص الإدارة فيها…"></textarea>
+              </label>
+              <label class="field field--full">
+                <span>وصف لوحة التحكم (إنجليزي)</span>
+                <textarea name="dashboardCopy_en" rows="4" dir="ltr" aria-describedby="projectDashboardCopyHelp"
+                  placeholder="Describe the project dashboard and its management features…"></textarea>
+              </label>
+              <p class="field-help field--full" id="projectDashboardCopyHelp">وصف اختياري مستقل يظهر مع تبويب «لوحة التحكم»، حتى لو لم تُضف صورًا لها بعد. وصف الموقع الأساسي يظل كما هو. إذا كتبت بلغة واحدة فقط ستُعرض أيضًا عند اختيار اللغة الأخرى.</p>
               <label class="field">
                 <span>رابط الموقع</span>
                 <input type="url" name="url" dir="ltr" placeholder="https://example.com" />
@@ -185,8 +196,8 @@
                 <input type="text" name="tags" placeholder="WordPress, WooCommerce, SEO" />
               </label>
               <div class="field field--full">
-                <span>صورة الغلاف</span>
-                <p class="field-help">تظهر في بطاقة المشروع. يمكنك أيضًا اختيار أي صورة من المعرض كغلاف.</p>
+                <span>صورة الغلاف المشتركة</span>
+                <p class="field-help">غلاف احتياطي للغتين. لاختيار غلاف عربي أو إنجليزي، اختر لغة الصور في المعرض ثم «اختيار كغلاف» أسفل الصورة المطلوبة.</p>
                 <div class="image-field">
                   <div class="image-field__preview" data-project-preview>
                     <span>لا توجد صورة</span>
@@ -200,15 +211,25 @@
                       <span>أو رابط صورة</span>
                       <input type="text" inputmode="url" name="image" dir="ltr" placeholder="https://… أو assets/uploads/…" />
                     </label>
-                    <button type="button" class="btn btn--ghost btn--danger" data-clear-image>إزالة الصورة</button>
+                    <button type="button" class="btn btn--ghost btn--danger" data-clear-image>إزالة الغلاف المشترك</button>
                   </div>
                 </div>
               </div>
               <div class="field field--full project-gallery-editor">
                 <div class="gallery-editor-heading">
-                  <div><h3>معرض صور المشروع</h3><p class="field-help">قسّم الصور بين واجهة الموقع ولوحة التحكم. الترتيب هنا هو ترتيب ظهورها للزائر.</p></div>
+                  <div><h3>معرض صور المشروع</h3><p class="field-help">اختر اللغة أولًا، ثم أضف صور الموقع ولوحة التحكم الخاصة بها. الترتيب والغلاف مستقلان لكل لغة.</p></div>
                   <span class="gallery-editor-total" id="projectGalleryTotal">0 صور</span>
                 </div>
+                <label class="field gallery-language-selector">
+                  <span>لغة الصور</span>
+                  <select id="projectGalleryLanguage" aria-describedby="projectGalleryLanguageHelp">
+                    <option value="shared">مشتركة — صور احتياطية للغتين</option>
+                    <option value="ar">العربية</option>
+                    <option value="en">الإنجليزية</option>
+                  </select>
+                </label>
+                <p class="field-help" id="projectGalleryLanguageHelp">اختر «العربية» لإدارة الصور العربية و«الإنجليزية» لإدارة صور النسخة الإنجليزية. الصور المشتركة اختيارية وتُستخدم فقط عند عدم وجود صور مخصصة لذلك القسم؛ لا تُستخدم صور اللغة الأخرى تلقائيًا.</p>
+                <p class="gallery-language-status" id="projectGalleryLanguageStatus" role="status" aria-live="polite"></p>
                 <p class="gallery-upload-status" id="projectUploadStatus" role="status" aria-live="polite"></p>
                 <section class="gallery-manager" data-gallery-manager="site" aria-labelledby="siteGalleryHeading">
                   <div class="gallery-manager__head">
@@ -468,9 +489,9 @@
 
   <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
 
-  <script src="project-media.js"></script>
+  <script src="project-media.js?v=project-locales-1"></script>
   <script src="admin-github.js"></script>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=project-locales-1"></script>
 </body>
 
 </html>

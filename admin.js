@@ -29,6 +29,7 @@
     activePanel: "home",
     projectSearch: "",
     editingProjectId: null,
+    galleryLanguage: "shared",
     uploading: false,
     quickProjectImage: ""
   };
@@ -463,6 +464,7 @@
       id: uid("project"),
       title: bi("", ""),
       copy: bi("", ""),
+      dashboardCopy: bi("", ""),
       url: "",
       image: "",
       gallery: { site: [], dashboard: [] },
@@ -494,7 +496,7 @@
 
       const media = document.createElement("div");
       media.className = "project-card__media";
-      const cover = window.ProjectMedia.cover(item);
+      const cover = window.ProjectMedia.cover(item, "ar") || window.ProjectMedia.cover(item, "en");
       if (cover) media.style.backgroundImage = 'url("' + cover.replace(/"/g, "%22") + '")';
       media.innerHTML =
         '<span class="project-card__badge' +
@@ -584,6 +586,11 @@
     form.elements.title_en.value = pickLang(item.title, "en");
     form.elements.copy_ar.value = pickLang(item.copy, "ar");
     form.elements.copy_en.value = pickLang(item.copy, "en");
+    // Keep a missing translation empty in the editor. Language fallback is for
+    // display only, so clearing one language never silently copies it back.
+    const dashboardCopy = item.dashboardCopy || {};
+    form.elements.dashboardCopy_ar.value = typeof dashboardCopy === "string" ? dashboardCopy : dashboardCopy.ar || "";
+    form.elements.dashboardCopy_en.value = typeof dashboardCopy === "string" ? dashboardCopy : dashboardCopy.en || "";
     form.elements.url.value = item.url || "";
     const cover = window.ProjectMedia.cover(item);
     form.elements.image.value = cover && !cover.startsWith("data:") ? cover : "";
@@ -594,6 +601,7 @@
     form.elements.visible.checked = item.visible !== false;
 
     updateProjectPreview(cover);
+    state.galleryLanguage = "shared";
     renderProjectGalleryEditor(item);
     el("projectUploadStatus").textContent = "";
 
@@ -642,6 +650,10 @@
     const fallbackTitle = form.elements.title_en.value.trim() || form.elements.title_ar.value.trim();
     item.title = bi(form.elements.title_en.value.trim() || fallbackTitle, form.elements.title_ar.value.trim() || fallbackTitle);
     item.copy = bi(form.elements.copy_en.value.trim() || form.elements.copy_ar.value.trim(), form.elements.copy_ar.value.trim() || form.elements.copy_en.value.trim());
+    const dashboardCopy = bi(form.elements.dashboardCopy_en.value.trim(), form.elements.dashboardCopy_ar.value.trim());
+    if (dashboardCopy.en || dashboardCopy.ar || Object.prototype.hasOwnProperty.call(item, "dashboardCopy")) {
+      item.dashboardCopy = dashboardCopy;
+    }
     item.url = form.elements.url.value.trim();
     // Do not turn every partially typed URL into a separate gallery image.
     if (validate) {
@@ -675,10 +687,18 @@
     updateProjectPreview(window.ProjectMedia.cover(item));
   }
 
-  function applyProjectGallery(item, gallery) {
-    item.gallery = { site: window.ProjectMedia.images(gallery.site), dashboard: window.ProjectMedia.images(gallery.dashboard) };
-    const all = item.gallery.site.concat(item.gallery.dashboard);
-    if (!all.includes(item.image)) item.image = all[0] || "";
+  function applyProjectGallery(item, gallery, language = "shared") {
+    const updated = { site: window.ProjectMedia.images(gallery.site), dashboard: window.ProjectMedia.images(gallery.dashboard) };
+    const all = updated.site.concat(updated.dashboard);
+    if (language === "ar" || language === "en") {
+      item.galleryByLanguage = Object.assign({}, item.galleryByLanguage, { [language]: updated });
+      if (item.imageByLanguage && item.imageByLanguage[language] && !all.includes(item.imageByLanguage[language])) {
+        item.imageByLanguage = Object.assign({}, item.imageByLanguage, { [language]: all[0] || "" });
+      }
+    } else {
+      item.gallery = updated;
+      if (!all.includes(item.image)) item.image = all[0] || "";
+    }
     item.updatedAt = nowISO();
     markDirty();
     renderProjects();
@@ -689,20 +709,30 @@
   }
 
   function renderProjectGalleryEditor(item) {
-    const gallery = window.ProjectMedia.normalize(item);
-    const cover = window.ProjectMedia.cover(item);
-    el("projectGalleryTotal").textContent = (gallery.site.length + gallery.dashboard.length) + " صور";
+    const language = state.galleryLanguage;
+    const label = language === "ar" ? "العربية" : language === "en" ? "الإنجليزية" : "المشتركة";
+    const gallery = window.ProjectMedia.editable(item, language);
+    const cover = window.ProjectMedia.cover(item, language);
+    el("projectGalleryLanguage").value = language;
+    q(".project-gallery-editor").dataset.galleryLanguage = language;
+    el("projectGalleryLanguageStatus").textContent = "تعرض الآن الصور " + label + ". الرفع والترتيب والحذف واختيار الغلاف هنا يخص هذه المجموعة فقط.";
+    el("projectGalleryTotal").textContent = window.ProjectMedia.count(item) + " صور إجمالًا";
     ["site", "dashboard"].forEach((group) => {
       const list = q('[data-gallery-list="' + group + '"]');
       list.replaceChildren();
       q('[data-gallery-count="' + group + '"]').textContent = gallery[group].length;
-      q('[data-gallery-empty="' + group + '"]').hidden = gallery[group].length > 0;
+      const empty = q('[data-gallery-empty="' + group + '"]');
+      empty.hidden = gallery[group].length > 0;
+      empty.textContent = language === "shared"
+        ? "لم تُضف صورًا مشتركة بعد. ارفع عدة صور مرة واحدة أو أضف رابطًا."
+        : "لا توجد صور مخصصة لهذه اللغة في هذا القسم. ستُعرض الصور المشتركة إن وُجدت، وليس صور اللغة الأخرى.";
+      q('[data-gallery-upload="' + group + '"]').setAttribute("aria-label", (group === "site" ? "رفع صور الموقع — " : "رفع صور لوحة التحكم — ") + label);
       gallery[group].forEach((src, index) => {
         const tile = document.createElement("article");
         tile.className = "gallery-editor-image" + (src === cover ? " is-cover" : "");
         const image = document.createElement("img");
         image.src = src;
-        image.alt = (group === "site" ? "صورة الموقع " : "صورة لوحة التحكم ") + (index + 1);
+        image.alt = (group === "site" ? "صورة الموقع " : "صورة لوحة التحكم ") + (index + 1) + " — " + label;
         image.loading = "lazy";
         image.decoding = "async";
         const tools = document.createElement("div");
@@ -717,19 +747,21 @@
           return node;
         };
         const chooseCover = button(src === cover ? "✓ الغلاف" : "اختيار كغلاف", () => {
-          if (src === item.image) return;
-          item.image = src;
-          applyProjectGallery(item, gallery);
+          const selectedCover = language === "shared" ? item.image : (item.imageByLanguage || {})[language];
+          if (src === selectedCover) return;
+          if (language === "shared") item.image = src;
+          else item.imageByLanguage = Object.assign({}, item.imageByLanguage, { [language]: src });
+          applyProjectGallery(item, gallery, language);
           const selected = q(".gallery-editor-image.is-cover .gallery-set-cover");
           if (selected) selected.focus({ preventScroll: true });
         }, false, "gallery-set-cover");
         chooseCover.setAttribute("aria-pressed", String(src === cover));
         chooseCover.setAttribute("aria-label", "اختيار الصورة " + (index + 1) + " كغلاف");
         const move = (direction) => {
-          const updated = window.ProjectMedia.normalize(item);
+          const updated = window.ProjectMedia.editable(item, language);
           const to = index + direction;
           [updated[group][index], updated[group][to]] = [updated[group][to], updated[group][index]];
-          applyProjectGallery(item, updated);
+          applyProjectGallery(item, updated, language);
           const target = q('[data-gallery-list="' + group + '"]').children[to];
           if (target) target.querySelector(direction < 0 ? '[data-move="later"]' : '[data-move="earlier"]').focus({ preventScroll: true });
         };
@@ -742,9 +774,9 @@
         later.setAttribute("aria-label", "تأخير الصورة " + (index + 1));
         later.title = "تأخير الصورة";
         const remove = button("حذف", () => {
-          const updated = window.ProjectMedia.normalize(item);
+          const updated = window.ProjectMedia.editable(item, language);
           updated[group].splice(index, 1);
-          applyProjectGallery(item, updated);
+          applyProjectGallery(item, updated, language);
         }, false, "gallery-remove-image");
         remove.setAttribute("aria-label", "حذف الصورة " + (index + 1));
         tools.append(earlier, later, remove);
@@ -757,13 +789,13 @@
   function setProjectUploadBusy(busy) {
     state.uploading = busy;
     const form = el("projectForm");
-    qa('button, [data-gallery-upload], [data-image-picker], [data-gallery-url]', form).forEach((node) => { node.disabled = busy; });
+    qa('button, [data-gallery-upload], [data-image-picker], [data-gallery-url], #projectGalleryLanguage', form).forEach((node) => { node.disabled = busy; });
     el("saveBtn").disabled = busy || state.saving;
     el("undoBtn").disabled = busy;
     form.setAttribute("aria-busy", String(busy));
   }
 
-  async function uploadProjectImages(input, group, makeCover) {
+  async function uploadProjectImages(input, group, makeCover, language = "shared") {
     const files = Array.from(input.files || []);
     if (!files.length || state.uploading) return;
     if (state.saving) { input.value = ""; toast("انتظر حتى تنتهي عملية النشر الحالية.", "warn"); return; }
@@ -780,10 +812,10 @@
           if (!/^image\/(png|jpeg|webp|gif|svg\+xml)$/.test(file.type)) throw new Error("نوع الصورة غير مدعوم");
           if (file.size > 6 * 1024 * 1024) throw new Error("حجم الصورة أكبر من 6 MB");
           const src = await uploadImage(file, true);
-          const gallery = window.ProjectMedia.normalize(item);
+          const gallery = window.ProjectMedia.editable(item, language);
           if (!gallery[group].includes(src)) gallery[group].push(src);
-          if (makeCover || !window.ProjectMedia.cover(item)) item.image = src;
-          applyProjectGallery(item, gallery);
+          if (makeCover) item.image = src; // The standalone upload edits the shared cover only.
+          applyProjectGallery(item, gallery, language);
           added += 1;
         } catch (error) {
           failed += 1;
@@ -1293,8 +1325,16 @@
       const item = projectById(state.editingProjectId);
       if (item && readProjectFields(el("projectForm"), item, false)) markDirty();
     });
+    el("projectGalleryLanguage").addEventListener("change", (event) => {
+      if (state.uploading || state.saving) { event.target.value = state.galleryLanguage; return; }
+      state.galleryLanguage = ["ar", "en"].includes(event.target.value) ? event.target.value : "shared";
+      qa("[data-gallery-url]").forEach((input) => { input.value = ""; });
+      el("projectUploadStatus").textContent = "";
+      const item = projectById(state.editingProjectId);
+      if (item) renderProjectGalleryEditor(item);
+    });
     qa("[data-gallery-upload]").forEach((input) => {
-      input.addEventListener("change", () => uploadProjectImages(input, input.dataset.galleryUpload, false));
+      input.addEventListener("change", () => uploadProjectImages(input, input.dataset.galleryUpload, false, state.galleryLanguage));
     });
     qa("[data-gallery-add-url]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1304,9 +1344,10 @@
         const src = window.ProjectMedia.source(input.value);
         if (!src) { toast("أدخل رابط صورة صالحًا.", "warn"); input.focus(); return; }
         if (!item) return;
-        const gallery = window.ProjectMedia.normalize(item);
+        const language = state.galleryLanguage;
+        const gallery = window.ProjectMedia.editable(item, language);
         if (!gallery[group].includes(src)) gallery[group].push(src);
-        applyProjectGallery(item, gallery);
+        applyProjectGallery(item, gallery, language);
         input.value = "";
       });
     });

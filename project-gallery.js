@@ -76,21 +76,39 @@
     }
   }
 
+  function description(group) {
+    var language = window.siteI18n ? window.siteI18n.getLanguage() : "en";
+    return window.ProjectMedia.description(state.item, group, language);
+  }
+
+  function hasGroupContent(group) {
+    return state.images[group].length > 0 || Boolean(description(group));
+  }
+
+  function groupAvailable(group) {
+    // A description is enough to make a section available before screenshots
+    // are uploaded. With no content at all, keep the website details reachable.
+    return hasGroupContent(group) || (group === "site" && !hasGroupContent("dashboard"));
+  }
+
   function showGroup(group, index) {
-    state.group = group;
-    if (!state.images[group].length && state.images[group === "site" ? "dashboard" : "site"].length) {
-      state.group = group === "site" ? "dashboard" : "site";
-    }
-    var hasImages = state.images.site.length + state.images.dashboard.length > 0;
+    var previousGroup = state.group;
+    state.group = groupAvailable(group) ? group : group === "site" ? "dashboard" : "site";
+    if (previousGroup !== state.group) dialog.querySelector(".gallery-details").scrollTop = 0;
     tabs.forEach(function (tab) {
       var key = tab.dataset.galleryTab;
       var selected = key === state.group;
-      tab.disabled = !state.images[key].length && (hasImages || key === "dashboard");
+      tab.disabled = !groupAvailable(key);
       tab.setAttribute("aria-selected", String(selected));
       tab.tabIndex = selected ? 0 : -1;
       tab.querySelector("[data-gallery-tab-count]").textContent = digits(state.images[key].length);
     });
     panel.setAttribute("aria-labelledby", state.group === "site" ? "gallerySiteTab" : "galleryDashboardTab");
+    var copy = description(state.group);
+    var isDashboard = state.group === "dashboard";
+    document.getElementById("galleryDescriptionHeading").textContent = t(isDashboard ? "project.dashboardDescription" : "project.siteDescription");
+    document.getElementById("galleryDescription").textContent = copy || t(isDashboard ? "project.noDashboardDescription" : "project.noSiteDescription");
+    document.getElementById("galleryDescriptionSection").classList.toggle("is-empty", !copy);
     thumbs.replaceChildren();
     currentImages().forEach(function (src, i) {
       var button = document.createElement("button");
@@ -115,9 +133,15 @@
     var index = items.findIndex(function (item, i) { return projectId(item, i) === state.id; });
     if (index === -1) { dialog.close(); return; }
     state.item = items[index];
-    state.images = window.ProjectMedia.normalize(state.item);
+    var previousImages = currentImages();
+    var language = window.siteI18n ? window.siteI18n.getLanguage() : "en";
+    state.images = window.ProjectMedia.normalize(state.item, language);
+    var updatedImages = currentImages();
+    // Different languages can have unrelated screenshots and ordering. Start
+    // at the first image when the collection changes, but keep the position
+    // when both languages use the same shared collection.
+    if (previousImages.length !== updatedImages.length || previousImages.some(function (src, i) { return src !== updatedImages[i]; })) state.index = 0;
     document.getElementById("galleryTitle").textContent = pick(state.item.title) || t("project.details");
-    document.getElementById("galleryDescription").textContent = pick(state.item.copy);
     document.getElementById("galleryProjectNumber").textContent = t("project.details") + " / " + digits(String(index + 1).padStart(2, "0"));
     var tags = document.getElementById("galleryTags");
     tags.replaceChildren();
@@ -152,6 +176,10 @@
       document.dispatchEvent(new CustomEvent("project-gallery-toggle", { detail: { open: true } }));
     }
     paintProject();
+    // Start a freshly opened project at its tabs and description, not at the
+    // previous project's last scroll position (including the mobile layout).
+    dialog.querySelector(".gallery-layout").scrollTop = 0;
+    dialog.querySelector(".gallery-details").scrollTop = 0;
     dialog.querySelector("[data-gallery-close]").focus({ preventScroll: true });
   }
 

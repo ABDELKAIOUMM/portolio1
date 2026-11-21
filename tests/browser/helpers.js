@@ -7,6 +7,11 @@ function fixtureContent() {
   const content = structuredClone(initial);
   content.updatedAt = "2026-11-17T23:59:00.000Z";
   const project = content.work.items[0];
+  // This fixture intentionally models the legacy/shared schema. Production
+  // projects may already have Arabic-only media; localized tests add their
+  // own independent language collections instead of inheriting real photos.
+  delete project.galleryByLanguage;
+  delete project.imageByLanguage;
   project.image = "https://images.example.test/storefront.svg";
   project.gallery = {
     site: [project.image, "https://images.example.test/product.svg", "https://images.example.test/long-page.svg"],

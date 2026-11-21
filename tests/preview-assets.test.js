@@ -22,6 +22,26 @@ test("work layout styles and scripts share a cache-busting version", () => {
   assert.equal(new Set(versions).size, 1, "the scene CSS and JS must be updated together");
 });
 
+test("project languages load matching versioned media, renderer, editor and styles", () => {
+  const versions = [];
+  for (const [page, files] of [
+    ["index.html", ["project-media.js", "project-gallery.js", "site-content.js", "i18n.js"]],
+    ["admin.html", ["project-media.js", "admin.js", "admin.css"]]
+  ]) {
+    const html = readFileSync(join(root, page), "utf8");
+    for (const file of files) {
+      const reference = Array.from(html.matchAll(/(?:src|href)="([^"]+)"/g))
+        .map((match) => new URL(match[1], "https://preview.test/"))
+        .find((url) => url.pathname === "/" + file);
+      assert.ok(reference, page + " must load " + file);
+      const version = reference.searchParams.get("v");
+      assert.ok(version, file + " must not reuse the older, unversioned script");
+      versions.push(version);
+    }
+  }
+  assert.equal(new Set(versions).size, 1, "new gallery/editor code must use the same media helper version");
+});
+
 test("the preview server does not retain stale CSS, HTML, JS or content", { timeout: 15000 }, async (t) => {
   const probe = net.createServer();
   probe.listen(0, "127.0.0.1");
@@ -46,7 +66,7 @@ test("the preview server does not retain stale CSS, HTML, JS or content", { time
     child.stdout.on("data", (data) => { if (String(data).includes("Site:")) resolve(); });
   });
 
-  for (const path of ["/index.html", "/style.css", "/work.css?v=work-viewport-4", "/work-carousel.js", "/script.js", "/content/site.json"]) {
+  for (const path of ["/index.html", "/style.css", "/work.css?v=work-viewport-5", "/work-carousel.js", "/script.js", "/project-media.js?v=project-locales-1", "/project-gallery.js?v=project-locales-1", "/admin.js?v=project-locales-1", "/content/site.json"]) {
     const response = await fetch(`http://127.0.0.1:${port}${path}`, { method: "HEAD" });
     assert.equal(response.status, 200, path);
     assert.equal(response.headers.get("cache-control"), "no-store", path + " must update immediately in an existing preview");
