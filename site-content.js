@@ -213,8 +213,8 @@
       var node = existing[index] || el("article", "project");
       var title = pick(item.title, l);
       var url = /^https?:\/\//i.test(item.url || "") ? item.url : "";
-      var cover = window.ProjectMedia.cover(item);
-      var photoCount = window.ProjectMedia.count(item);
+      var cover = window.ProjectMedia.cover(item, l);
+      var photoCount = window.ProjectMedia.count(item, l);
       node.dataset.url = url;
       node.dataset.contentId = item.id || "project-" + index;
       // The work carousel owns visibility; the generic reveal animation must

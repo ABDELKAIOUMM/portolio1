@@ -18,8 +18,8 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=work-viewport-4" />
-  <link rel="stylesheet" href="work.css?v=work-viewport-4" />
+  <link rel="stylesheet" href="style.css?v=work-viewport-5" />
+  <link rel="stylesheet" href="work.css?v=work-viewport-5" />
 </head>
 
 <body>
@@ -730,10 +730,10 @@
       <div class="gallery-layout">
         <section class="gallery-visuals" aria-label="Project screenshots" data-i18n-aria="project.screenshots">
           <div class="gallery-tabs" role="tablist" aria-label="Screenshot category" data-i18n-aria="project.category">
-            <button type="button" role="tab" id="gallerySiteTab" aria-controls="galleryPanel" data-gallery-tab="site">
+            <button type="button" role="tab" id="gallerySiteTab" aria-controls="galleryPanel galleryDescriptionSection" data-gallery-tab="site">
               <span data-i18n="project.siteShots">Website</span><span data-gallery-tab-count="site">0</span>
             </button>
-            <button type="button" role="tab" id="galleryDashboardTab" aria-controls="galleryPanel" data-gallery-tab="dashboard">
+            <button type="button" role="tab" id="galleryDashboardTab" aria-controls="galleryPanel galleryDescriptionSection" data-gallery-tab="dashboard">
               <span data-i18n="project.dashboardShots">Dashboard</span><span data-gallery-tab-count="dashboard">0</span>
             </button>
           </div>
@@ -762,7 +762,10 @@
         <aside class="gallery-details">
           <span class="gallery-project-number" id="galleryProjectNumber"></span>
           <h2 id="galleryTitle"></h2>
-          <p id="galleryDescription"></p>
+          <section class="gallery-description" id="galleryDescriptionSection" aria-labelledby="galleryDescriptionHeading" aria-live="polite">
+            <h3 id="galleryDescriptionHeading"></h3>
+            <p id="galleryDescription" dir="auto"></p>
+          </section>
           <ul class="project-tags gallery-tags" id="galleryTags"></ul>
           <a class="gallery-visit" id="galleryVisit" target="_blank" rel="noopener noreferrer">
             <span data-gallery-visit-label>Visit site</span><span aria-hidden="true">↗</span>
@@ -789,14 +792,14 @@
   <script src="content/site-data.js"></script>
   <script src="content-loader.js"></script>
   <!-- Localization must initialize before UI scripts read page copy. -->
-  <script src="i18n.js"></script>
+  <script src="i18n.js?v=project-locales-1"></script>
   <!-- Paints every editable section from content/site.json -->
-  <script src="project-media.js"></script>
-  <script src="site-content.js"></script>
+  <script src="project-media.js?v=project-locales-1"></script>
+  <script src="site-content.js?v=project-locales-1"></script>
   <!-- Main Script -->
-  <script src="script.js?v=work-viewport-4"></script>
-  <script src="work-carousel.js?v=work-viewport-4"></script>
-  <script src="project-gallery.js"></script>
+  <script src="script.js?v=work-viewport-5"></script>
+  <script src="work-carousel.js?v=work-viewport-5"></script>
+  <script src="project-gallery.js?v=project-locales-1"></script>
 </body>
 
 </html>
